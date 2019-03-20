@@ -1,0 +1,21 @@
+group 'com.shouwn.oj'
+version '0.0.1'
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+dependencies {
+    // jpa
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'com.querydsl:querydsl-jpa'
+    compile 'com.querydsl:querydsl-apt'
+
+    // db
+    runtimeOnly 'mysql:mysql-connector-java'
+//    runtimeOnly('com.h2database:h2')
+}
