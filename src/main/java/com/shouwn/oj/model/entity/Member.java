@@ -1,18 +1,22 @@
 package com.shouwn.oj.model.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.*;
 
-import com.shouwn.oj.model.enums.Role;
-import com.shouwn.oj.util.KotlinStyle;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 
 @Entity
-@Table(name = "members")
-public class Member extends BaseEntity implements KotlinStyle<Member> {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "role")
+public abstract class Member extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,20 +29,26 @@ public class Member extends BaseEntity implements KotlinStyle<Member> {
 	private String password;
 
 	@Column(nullable = false)
-	private String nickname;
+	private String name;
 
-	@Column
+	@Column(nullable = false)
 	private String email;
 
-	@Enumerated(EnumType.STRING)
-	private Role role;
+	@ManyToMany
+	@JoinTable(
+			name = "member_course",
+			joinColumns = @JoinColumn(name = "member_id"),
+			inverseJoinColumns = @JoinColumn(name = "course_id")
+	)
+	private List<Course> courses = new ArrayList<>();
 
-	@Builder
-	public Member(String username, String password, String nickname, String email, Role role) {
+	@OneToMany(mappedBy = "member")
+	private List<Solution> solutions = new ArrayList<>();
+
+	public Member(String username, String password, String name, String email) {
 		this.username = username;
 		this.password = password;
-		this.nickname = nickname;
+		this.name = name;
 		this.email = email;
-		this.role = role;
 	}
 }
