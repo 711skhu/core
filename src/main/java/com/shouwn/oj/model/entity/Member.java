@@ -34,14 +34,6 @@ public abstract class Member extends BaseEntity {
 	@Column(nullable = false)
 	private String email;
 
-	@ManyToMany
-	@JoinTable(
-			name = "member_course",
-			joinColumns = @JoinColumn(name = "member_id"),
-			inverseJoinColumns = @JoinColumn(name = "course_id")
-	)
-	private List<Course> courses = new ArrayList<>();
-
 	@OneToMany(mappedBy = "member")
 	private List<Solution> solutions = new ArrayList<>();
 

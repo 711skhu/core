@@ -27,11 +27,9 @@ public class Problem extends BaseEntity {
 	private String title;
 
 	@Column(nullable = true)
-	@Temporal(TemporalType.TIMESTAMP)
 	private LocalDateTime startDate;
 
 	@Column(nullable = true)
-	@Temporal(TemporalType.TIMESTAMP)
 	private LocalDateTime endDate;
 
 	@ManyToOne

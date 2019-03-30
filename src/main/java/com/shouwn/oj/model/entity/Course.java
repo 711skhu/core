@@ -31,8 +31,8 @@ public class Course extends BaseEntity {
 	@JoinColumn(name = "professor_id")
 	private Admin professor;
 
-	@ManyToMany(mappedBy = "course")
-	private List<Member> students = new ArrayList<>();
+	@ManyToMany(mappedBy = "courses")
+	private List<Student> students = new ArrayList<>();
 
 	@OneToMany(mappedBy = "course")
 	private List<Problem> problems = new ArrayList<>();
