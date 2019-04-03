@@ -1,9 +1,12 @@
-package com.shouwn.oj.model.entity;
+package com.shouwn.oj.model.entity.problem;
 
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
 
+import com.shouwn.oj.model.entity.BaseEntity;
+import com.shouwn.oj.model.entity.member.Admin;
+import com.shouwn.oj.model.entity.member.Student;
 import lombok.*;
 
 @Getter

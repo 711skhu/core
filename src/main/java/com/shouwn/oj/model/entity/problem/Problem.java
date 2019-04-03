@@ -1,10 +1,11 @@
-package com.shouwn.oj.model.entity;
+package com.shouwn.oj.model.entity.problem;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
 
+import com.shouwn.oj.model.entity.BaseEntity;
 import com.shouwn.oj.model.enums.ProblemType;
 import lombok.*;
 

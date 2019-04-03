@@ -1,7 +1,8 @@
-package com.shouwn.oj.model.entity;
+package com.shouwn.oj.model.entity.problem;
 
 import javax.persistence.*;
 
+import com.shouwn.oj.model.entity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
