@@ -3,10 +3,7 @@ package com.shouwn.oj.model.entity.problem;
 import javax.persistence.*;
 
 import com.shouwn.oj.model.entity.BaseEntity;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -27,4 +24,11 @@ public class TestCase extends BaseEntity {
 	@ManyToOne
 	@JoinColumn(name = "problem_detail_id")
 	private ProblemDetail problemDetail;
+
+	@Builder
+	public TestCase(String params, String result, ProblemDetail problemDetail) {
+		this.params = params;
+		this.result = result;
+		this.problemDetail = problemDetail;
+	}
 }
