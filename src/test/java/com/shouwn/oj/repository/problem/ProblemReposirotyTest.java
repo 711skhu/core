@@ -1,8 +1,5 @@
 package com.shouwn.oj.repository.problem;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 import com.shouwn.oj.model.entity.member.Admin;
 import com.shouwn.oj.model.entity.problem.Course;
 import com.shouwn.oj.model.entity.problem.Problem;
@@ -55,8 +52,6 @@ public class ProblemReposirotyTest {
 		Problem problem = Problem.builder()
 				.type(HOMEWORK)
 				.title("junit_test")
-				.startDate(LocalDateTime.parse("2019-04-07 12:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-				.endDate(LocalDateTime.parse("2019-04-10 12:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
 				.course(newCourse)
 				.build();
 
@@ -95,8 +90,6 @@ public class ProblemReposirotyTest {
 		Problem problem = Problem.builder()
 				.type(HOMEWORK)
 				.title("junit_test")
-				.startDate(LocalDateTime.parse("2019-04-07 12:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-				.endDate(LocalDateTime.parse("2019-04-10 12:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
 				.course(newCourse)
 				.build();
 
@@ -104,8 +97,6 @@ public class ProblemReposirotyTest {
 
 		problem.setType(EXAM);
 		problem.setTitle("update_junit_test");
-		problem.setStartDate(LocalDateTime.parse("2019-04-07 14:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-		problem.setEndDate(LocalDateTime.parse("2019-04-11 14:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
 		Problem findProblem = problemRepository.findById(problem.getId())
 				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
@@ -140,8 +131,6 @@ public class ProblemReposirotyTest {
 		Problem problem = Problem.builder()
 				.type(HOMEWORK)
 				.title("junit_test")
-				.startDate(LocalDateTime.parse("2019-04-07 12:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-				.endDate(LocalDateTime.parse("2019-04-10 12:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
 				.course(newCourse)
 				.build();
 

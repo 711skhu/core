@@ -74,8 +74,6 @@ public class CommentRepositoryTest {
 		Problem problem = Problem.builder()
 				.type(PRACTICE)
 				.title("junit_test")
-				.startDate(null)
-				.endDate(null)
 				.course(newCourse)
 				.build();
 
@@ -149,8 +147,6 @@ public class CommentRepositoryTest {
 		Problem problem = Problem.builder()
 				.type(PRACTICE)
 				.title("junit_test")
-				.startDate(null)
-				.endDate(null)
 				.course(newCourse)
 				.build();
 
@@ -226,8 +222,6 @@ public class CommentRepositoryTest {
 		Problem problem = Problem.builder()
 				.type(PRACTICE)
 				.title("junit_test")
-				.startDate(null)
-				.endDate(null)
 				.course(newCourse)
 				.build();
 

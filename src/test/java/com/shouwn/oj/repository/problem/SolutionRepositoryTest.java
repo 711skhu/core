@@ -1,8 +1,5 @@
 package com.shouwn.oj.repository.problem;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 import com.shouwn.oj.model.entity.member.Admin;
 import com.shouwn.oj.model.entity.member.Student;
 import com.shouwn.oj.model.entity.problem.Course;
@@ -77,8 +74,6 @@ public class SolutionRepositoryTest {
 		Problem problem = Problem.builder()
 				.type(HOMEWORK)
 				.title("junit_test")
-				.startDate(LocalDateTime.parse("2019-04-07 12:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-				.endDate(LocalDateTime.parse("2019-04-10 12:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
 				.course(newCourse)
 				.build();
 
@@ -143,8 +138,6 @@ public class SolutionRepositoryTest {
 		Problem problem = Problem.builder()
 				.type(HOMEWORK)
 				.title("junit_test")
-				.startDate(LocalDateTime.parse("2019-04-07 12:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-				.endDate(LocalDateTime.parse("2019-04-10 12:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
 				.course(newCourse)
 				.build();
 
@@ -212,8 +205,6 @@ public class SolutionRepositoryTest {
 		Problem problem = Problem.builder()
 				.type(HOMEWORK)
 				.title("junit_test")
-				.startDate(LocalDateTime.parse("2019-04-07 12:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-				.endDate(LocalDateTime.parse("2019-04-10 12:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
 				.course(newCourse)
 				.build();
 
