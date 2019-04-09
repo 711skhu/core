@@ -23,6 +23,11 @@ public class Student extends Member {
 	)
 	private List<Course> courses = new ArrayList<>();
 
+	@Override
+	public String getRole(){
+		return "STUDENT";
+	}
+
 	@Builder
 	public Student(String username, String password, String name, String email) {
 		super(username, password, name, email);

@@ -39,6 +39,8 @@ public abstract class Member extends BaseEntity {
 	@OneToMany(mappedBy = "member")
 	private List<Solution> solutions = new ArrayList<>();
 
+	public abstract String getRole();
+
 	public Member(String username, String password, String name, String email) {
 		this.username = username;
 		this.password = password;

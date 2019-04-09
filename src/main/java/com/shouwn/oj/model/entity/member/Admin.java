@@ -20,6 +20,11 @@ public class Admin extends Member {
 	@OneToMany(mappedBy = "professor")
 	private List<Course> courses = new ArrayList<>();
 
+	@Override
+	public String getRole(){
+		return "ADMIN";
+	}
+
 	@Builder
 	public Admin(String username, String password, String name, String email) {
 		super(username, password, name, email);
