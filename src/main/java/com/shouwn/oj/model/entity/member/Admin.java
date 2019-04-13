@@ -21,7 +21,7 @@ public class Admin extends Member {
 	private List<Course> courses = new ArrayList<>();
 
 	@Override
-	public String getRole(){
+	public String getRole() {
 		return "ADMIN";
 	}
 

@@ -24,7 +24,7 @@ public class Student extends Member {
 	private List<Course> courses = new ArrayList<>();
 
 	@Override
-	public String getRole(){
+	public String getRole() {
 		return "STUDENT";
 	}
 
