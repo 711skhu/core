@@ -1,7 +1,8 @@
 spring:
   profiles:
     include:
-      - datasource
+      - datasource,
+      - jwt
   jpa:
     show-sql: true
     properties:
