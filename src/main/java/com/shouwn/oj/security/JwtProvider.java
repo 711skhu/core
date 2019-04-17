@@ -1,37 +1,43 @@
 package com.shouwn.oj.security;
 
+import java.security.Key;
 import java.util.Date;
 
-import io.jsonwebtoken.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import com.shouwn.oj.config.jwt.JwtProperties;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
-@Component
 public class JwtProvider {
 
-	@Value("${jwt.secretKey}")
-	public String secretKey;
+	private final JwtProperties jwtProperties;
 
-	@Value("${jwt.expirationMs}")
-	public long expirationMs;
+	private final Key secretKey;
 
-	private Date now = new Date();
+	public JwtProvider(JwtProperties jwtProperties) {
+		this.jwtProperties = jwtProperties;
+		this.secretKey = Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes());
+	}
 
 	public String generateJwt(Long id) {
+		Date now = new Date();
+
 		return Jwts.builder()
 				.setSubject(String.valueOf(id))
 				.setIssuedAt(now)
-				.setExpiration(new Date(now.getTime() + expirationMs))
-				.signWith(SignatureAlgorithm.HS256, secretKey)
+				.setExpiration(new Date(now.getTime() + jwtProperties.getExpirationMs()))
+				.signWith(secretKey)
 				.compact();
 	}
 
-	public Long getUserIdFromJwt(String token) {
+	public Long getMemberIdFromJwt(String token) throws JwtException, IllegalArgumentException {
 			Claims claims = Jwts.parser()
 					.setSigningKey(secretKey)
 					.parseClaimsJws(token)
 					.getBody();
-			return Long.parseLong(claims.getId());
+
+			return Long.parseLong(claims.getSubject());
 	}
 
 }
