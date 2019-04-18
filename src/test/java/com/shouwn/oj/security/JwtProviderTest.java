@@ -1,20 +1,23 @@
 package com.shouwn.oj.security;
 
+import com.shouwn.oj.config.jwt.JwtConfig;
 import io.jsonwebtoken.JwtException;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = JwtConfig.class)
+@Import(value = JwtTestConfig.class)
 public class JwtProviderTest {
 
 	private JwtProvider jwtProvider;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		jwtProvider = new JwtProvider(new JwtTestProperties());
 	}
@@ -27,14 +30,18 @@ public class JwtProviderTest {
 		Assertions.assertEquals(jwtProvider.getMemberIdFromJwt(token), id);
 	}
 
-	@Test(expected = JwtException.class)
+	@Test
 	public void getMemberIdFromJwtThrowsJwtException() {
-		jwtProvider.getMemberIdFromJwt("token");
+		Assertions.assertThrows(JwtException.class, () ->
+			jwtProvider.getMemberIdFromJwt("token")
+		);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void getMemberIdFromJwtThrowsIllegalArgumentException() {
-		jwtProvider.getMemberIdFromJwt(null);
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
+				jwtProvider.getMemberIdFromJwt(null)
+		);
 	}
 
 }
