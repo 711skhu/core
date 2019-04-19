@@ -1,4 +1,4 @@
-package com.shouwn.oj.security;
+package com.shouwn.oj.config.security;
 
 import com.shouwn.oj.config.jwt.JwtProperties;
 

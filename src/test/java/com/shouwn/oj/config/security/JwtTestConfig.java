@@ -1,4 +1,4 @@
-package com.shouwn.oj.security;
+package com.shouwn.oj.config.security;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
