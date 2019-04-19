@@ -32,12 +32,12 @@ public class JwtProvider {
 	}
 
 	public Long getMemberIdFromJwt(String token) throws JwtException, IllegalArgumentException {
-			Claims claims = Jwts.parser()
-					.setSigningKey(secretKey)
-					.parseClaimsJws(token)
-					.getBody();
+		Claims claims = Jwts.parser()
+				.setSigningKey(secretKey)
+				.parseClaimsJws(token)
+				.getBody();
 
-			return Long.parseLong(claims.getSubject());
+		return Long.parseLong(claims.getSubject());
 	}
 
 }

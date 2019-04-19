@@ -1,26 +1,23 @@
 package com.shouwn.oj.security;
 
-import com.shouwn.oj.config.jwt.JwtConfig;
+import com.shouwn.oj.config.security.JwtTestConfig;
 import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = JwtConfig.class)
-@Import(value = JwtTestConfig.class)
+@Import(JwtTestConfig.class)
+@SpringBootTest(classes = JwtProvider.class)
 public class JwtProviderTest {
 
+	@Autowired
 	private JwtProvider jwtProvider;
-
-	@BeforeEach
-	public void setUp() {
-		jwtProvider = new JwtProvider(new JwtTestProperties());
-	}
 
 	@Test
 	public void getMemberIdFromJwtToSuccess() {
@@ -33,7 +30,7 @@ public class JwtProviderTest {
 	@Test
 	public void getMemberIdFromJwtThrowsJwtException() {
 		Assertions.assertThrows(JwtException.class, () ->
-			jwtProvider.getMemberIdFromJwt("token")
+				jwtProvider.getMemberIdFromJwt("token")
 		);
 	}
 
