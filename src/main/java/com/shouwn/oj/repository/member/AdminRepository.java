@@ -4,5 +4,5 @@ import com.shouwn.oj.model.entity.member.Admin;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AdminRepository extends JpaRepository<Admin, Long>, StudentRepositoryCustom {
+public interface AdminRepository extends JpaRepository<Admin, Long>, StudentRepositoryCustom, MemberRepository<Admin, Long> {
 }

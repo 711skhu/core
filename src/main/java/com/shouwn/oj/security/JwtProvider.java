@@ -3,7 +3,6 @@ package com.shouwn.oj.security;
 import java.security.Key;
 import java.util.Date;
 
-import com.shouwn.oj.config.jwt.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
