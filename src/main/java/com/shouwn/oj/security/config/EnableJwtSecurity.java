@@ -15,9 +15,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @Import({JwtSecurityConfig.class})
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
-		securedEnabled = true,    // @Secured
-		jsr250Enabled = true,    // @RolesAllowed
-		prePostEnabled = true    // @PreAuthorize
+		securedEnabled = true,	// @Secured
+		jsr250Enabled = true,	// @RolesAllowed
+		prePostEnabled = true	// @PreAuthorize
 )
 public @interface EnableJwtSecurity {
 }

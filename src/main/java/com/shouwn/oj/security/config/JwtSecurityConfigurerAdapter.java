@@ -4,7 +4,6 @@ import com.shouwn.oj.security.JwtProperties;
 import com.shouwn.oj.security.JwtProvider;
 import com.shouwn.oj.service.member.MemberService;
 
-import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.context.annotation.Bean;
 
 public abstract class JwtSecurityConfigurerAdapter {

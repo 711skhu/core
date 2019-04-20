@@ -3,6 +3,7 @@ package com.shouwn.oj.repository.member;
 import com.shouwn.oj.config.repository.RepositoryTestConfig;
 import com.shouwn.oj.model.entity.member.Student;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -22,35 +23,42 @@ public class StudentRepositoryTest {
 	@Autowired
 	private StudentRepository studentRepository;
 
-	@Test
-	public void saveAndFind() {
-		Student student = Student.builder()
+	private Student student;
+
+	@BeforeEach
+	public void init() {
+		this.student = Student.builder()
 				.username("junit_tester")
 				.password("test123")
 				.name("tester")
 				.email("test@gmail.com")
 				.build();
+	}
 
+	private void assertEquals(Student student, Student other) {
+		if (student != null || other != null) {
+			Assertions.assertNotNull(student);
+			Assertions.assertNotNull(other);
+		}
+
+		Assertions.assertEquals(student.getUsername(), other.getUsername());
+		Assertions.assertEquals(student.getPassword(), other.getPassword());
+		Assertions.assertEquals(student.getName(), other.getName());
+		Assertions.assertEquals(student.getEmail(), other.getEmail());
+	}
+
+	@Test
+	public void saveAndFind() {
 		studentRepository.save(student);
 
 		Student findStudent = studentRepository.findById(student.getId())
 				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
 
-		Assertions.assertEquals(student.getUsername(), findStudent.getUsername());
-		Assertions.assertEquals(student.getPassword(), findStudent.getPassword());
-		Assertions.assertEquals(student.getName(), findStudent.getName());
-		Assertions.assertEquals(student.getEmail(), findStudent.getEmail());
+		assertEquals(student, findStudent);
 	}
 
 	@Test
 	public void update() {
-		Student student = Student.builder()
-				.username("junit_tester")
-				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
-				.build();
-
 		studentRepository.save(student);
 
 		student.setUsername("update_junit_tester");
@@ -61,33 +69,44 @@ public class StudentRepositoryTest {
 		Student findStudent = studentRepository.findById(student.getId())
 				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
 
-		Assertions.assertEquals(student.getUsername(), findStudent.getUsername());
-		Assertions.assertEquals(student.getPassword(), findStudent.getPassword());
-		Assertions.assertEquals(student.getName(), findStudent.getName());
-		Assertions.assertEquals(student.getEmail(), findStudent.getEmail());
+		assertEquals(student, findStudent);
 	}
 
 	@Test
 	public void delete() {
-		Student student = Student.builder()
-				.username("junit_tester")
-				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
-				.build();
-
 		studentRepository.save(student);
 
 		Student findStudent = studentRepository.findById(student.getId())
 				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
 
-		Assertions.assertEquals(student.getUsername(), findStudent.getUsername());
-		Assertions.assertEquals(student.getPassword(), findStudent.getPassword());
-		Assertions.assertEquals(student.getName(), findStudent.getName());
-		Assertions.assertEquals(student.getEmail(), findStudent.getEmail());
+		assertEquals(student, findStudent);
 
 		studentRepository.delete(student);
 
 		Assertions.assertFalse(studentRepository.findById(student.getId()).isPresent());
+	}
+
+	@Test
+	public void findByUsernameTest() {
+		studentRepository.save(student);
+
+		Student findStudent = studentRepository.findByUsername(student.getUsername())
+				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
+
+		assertEquals(student, findStudent);
+
+		Assertions.assertFalse(studentRepository.findByUsername("illegalUsername").isPresent());
+	}
+
+	@Test
+	public void findByEmailTest() {
+		studentRepository.save(student);
+
+		Student findStudent = studentRepository.findByEmail(student.getEmail())
+				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
+
+		assertEquals(student, findStudent);
+
+		Assertions.assertFalse(studentRepository.findByEmail("illegalEmail").isPresent());
 	}
 }
