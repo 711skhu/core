@@ -9,4 +9,6 @@ public interface MemberRepository<T extends Member, ID> {
 	Optional<T> findById(ID id);
 
 	Optional<T> findByUsername(String username);
+
+	Optional<T> findByEmail(String email);
 }

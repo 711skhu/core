@@ -2,6 +2,9 @@ package com.shouwn.oj.service.member;
 
 import javax.persistence.EntityNotFoundException;
 
+import com.shouwn.oj.exception.member.EmailExistException;
+import com.shouwn.oj.exception.member.MemberException;
+import com.shouwn.oj.exception.member.UsernameExistException;
 import com.shouwn.oj.model.entity.member.Member;
 import com.shouwn.oj.repository.member.MemberRepository;
 import com.shouwn.oj.security.MemberPrincipal;
@@ -9,6 +12,7 @@ import com.shouwn.oj.security.MemberPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -35,4 +39,25 @@ public abstract class MemberService implements UserDetailsService {
 		return MemberPrincipal.of(member);
 	}
 
+	protected void checkPossibleToMakeMember(Member member) {
+		if (member == null) {
+			throw new IllegalArgumentException("매개변수로 들어온 admin 이 null 입니다.");
+		}
+
+		if (isRegisteredUsername(member.getUsername())) {
+			throw new UsernameExistException(member.getUsername() + " 은 이미 등록된 아이디입니다.");
+		}
+
+		if (isRegisteredEmail(member.getEmail())) {
+			throw new EmailExistException(member.getEmail() + " 은 이미 등록된 이메일입니다.");
+		}
+	}
+
+	public boolean isRegisteredUsername(String username) {
+		return memberRepository.findByUsername(username).isPresent();
+	}
+
+	public boolean isRegisteredEmail(String email) {
+		return memberRepository.findByEmail(email).isPresent();
+	}
 }
