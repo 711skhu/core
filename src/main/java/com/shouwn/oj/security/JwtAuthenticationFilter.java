@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(@Nonnull HttpServletRequest request,
 									@Nonnull HttpServletResponse response,
 									@Nonnull FilterChain filterChain) throws ServletException, IOException {
-		Long memberId = null;
+		Long memberId = 0L;
 
 		String jwt = jwtFromRequest(request);
 
