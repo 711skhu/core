@@ -17,12 +17,16 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 @Slf4j
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-	private final ObjectMapper mapper = new ObjectMapper();
+	private final ObjectMapper mapper;
+
+	public JwtAuthenticationEntryPoint(ObjectMapper mapper) {
+		this.mapper = mapper;
+	}
 
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
 		String responseJson = mapper.writeValueAsString(CommonResponse.builder()
-				.status(HttpStatus.UNAUTHORIZED.value())
+				.status(HttpStatus.UNAUTHORIZED)
 				.message("인증되지 않은 사용자입니다.")
 				.build());
 

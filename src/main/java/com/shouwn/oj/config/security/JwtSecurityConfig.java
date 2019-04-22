@@ -1,5 +1,6 @@
 package com.shouwn.oj.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shouwn.oj.security.JwtAuthenticationEntryPoint;
 import com.shouwn.oj.security.JwtAuthenticationFilter;
 import com.shouwn.oj.security.JwtProvider;
@@ -11,6 +12,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -18,17 +21,21 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private final JwtProvider jwtProvider;
 
+	private final ObjectMapper objectMapper;
+
 	private final MemberService securityMemberService;
 
 	public JwtSecurityConfig(JwtProvider jwtProvider,
+							 ObjectMapper objectMapper,
 							 @Qualifier("securityMemberService") MemberService securityMemberService) {
 		this.jwtProvider = jwtProvider;
+		this.objectMapper = objectMapper;
 		this.securityMemberService = securityMemberService;
 	}
 
 	@Bean
 	public JwtAuthenticationFilter jwtAuthenticationFilter() {
-		return new JwtAuthenticationFilter(jwtProvider, securityMemberService);
+		return new JwtAuthenticationFilter(jwtProvider, objectMapper, securityMemberService);
 	}
 
 	@Bean
@@ -51,7 +58,13 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 
+	@Bean
 	public AuthenticationEntryPoint jwtAuthenticationEntryPoint() {
-		return new JwtAuthenticationEntryPoint();
+		return new JwtAuthenticationEntryPoint(objectMapper);
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 	}
 }
