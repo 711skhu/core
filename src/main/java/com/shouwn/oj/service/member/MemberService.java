@@ -52,7 +52,7 @@ public abstract class MemberService implements UserDetailsService {
 	protected <T extends Member> void checkPossibleToMakeMember(T member)
 			throws UsernameExistException, PasswordStrengthLeakException, EmailExistException {
 		if (member == null) {
-			throw new IllegalArgumentException("매개변수로 들어온 admin 이 null 입니다.");
+			throw new IllegalArgumentException("매개변수로 들어온 member 가 null 입니다.");
 		}
 
 		if (isRegisteredUsername(member.getUsername())) {
