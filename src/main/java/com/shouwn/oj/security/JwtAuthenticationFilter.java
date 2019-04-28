@@ -1,7 +1,6 @@
 package com.shouwn.oj.security;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.annotation.Nonnull;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -11,18 +10,14 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shouwn.oj.model.response.ApiResponse;
 import com.shouwn.oj.model.response.CommonResponse;
-import com.shouwn.oj.service.member.MemberService;
+import com.shouwn.oj.util.servlet.ResponseUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j
@@ -32,14 +27,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final ObjectMapper objectMapper;
 
-	private final MemberService memberService;
-
-	public JwtAuthenticationFilter(JwtProvider jwtProvider, ObjectMapper objectMapper, MemberService memberService) {
+	public JwtAuthenticationFilter(JwtProvider jwtProvider, ObjectMapper objectMapper) {
 		this.jwtProvider = jwtProvider;
 		this.objectMapper = objectMapper;
-		this.memberService = memberService;
 	}
 
+	/**
+	 * 헤더에 jwt 가 있는지 확인하고
+	 * 있다면 jwt 에서 memberId를 가져오는 메소드
+	 */
 	@Override
 	protected void doFilterInternal(@Nonnull HttpServletRequest request,
 									@Nonnull HttpServletResponse response,
@@ -53,15 +49,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			try {
 				memberId = jwtProvider.getMemberIdFromJwt(jwt);
 			} catch (ExpiredJwtException e) {
-				setApiResponseToServletResponse(response, responseExpiredJwt());
+				String json = objectMapper.writeValueAsString(responseExpiredJwt());
+				ResponseUtils.setJsonToResponse(response, json);
 				return;
 			} catch (JwtException e) {
-				setApiResponseToServletResponse(response, responseJwtNotValid());
+				String json = objectMapper.writeValueAsString(responseJwtNotValid());
+				ResponseUtils.setJsonToResponse(response, json);
 				return;
 			}
 
-			Authentication authentication = authenticationFromMemberId(memberId, request);
-			SecurityContextHolder.getContext().setAuthentication(authentication);
+			SecurityContextHolder.getContext().setAuthentication(new JwtAuthenticationToken(memberId));
 		}
 
 		request.setAttribute("requesterId", memberId);
@@ -76,26 +73,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		} else {
 			return null;
 		}
-	}
-
-	private Authentication authenticationFromMemberId(Long memberId, HttpServletRequest request) {
-		UserDetails userDetails = memberService.loadUserById(memberId);
-
-		UsernamePasswordAuthenticationToken authentication =
-				new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-		authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-		return authentication;
-	}
-
-	private void setApiResponseToServletResponse(HttpServletResponse response, ApiResponse<?> apiResponse) throws IOException {
-		String json = objectMapper.writeValueAsString(apiResponse);
-		response.setStatus(HttpStatus.OK.value());
-		response.setContentType("application/json;charset=UTF-8");
-
-		PrintWriter out = response.getWriter();
-		out.print(json);
-		out.flush();
 	}
 
 	private ApiResponse<?> responseExpiredJwt() {

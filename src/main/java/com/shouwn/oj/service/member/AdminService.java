@@ -12,14 +12,13 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class AdminService extends MemberService {
+public class AdminService implements MemberAuthService<Admin>, MemberService<Admin> {
 
 	private final AdminRepository adminRepository;
 
 	private final PasswordEncoder passwordEncoder;
 
 	public AdminService(AdminRepository adminRepository, @Lazy PasswordEncoder passwordEncoder) {
-		super(passwordEncoder);
 		this.adminRepository = adminRepository;
 		this.passwordEncoder = passwordEncoder;
 	}
@@ -49,7 +48,7 @@ public class AdminService extends MemberService {
 				.email(email)
 				.build();
 
-		checkPossibleToMakeAdmin(admin);
+		checkPossibleToMakeMember(admin);
 
 		admin.setPassword(passwordEncoder.encode(admin.getPassword()));
 
@@ -64,9 +63,10 @@ public class AdminService extends MemberService {
 	 * @throws PasswordStrengthLeakException 비밀번호 강도가 약할 때 발생하는 예외
 	 * @throws EmailExistException           이메일이 이미 등록되었을 때 발생하는 예외
 	 */
-	private void checkPossibleToMakeAdmin(Admin admin)
+	@Override
+	public void checkPossibleToMakeMember(Admin admin)
 			throws UsernameExistException, PasswordStrengthLeakException, EmailExistException {
-		checkPossibleToMakeMember(admin);
+		MemberAuthService.super.checkPossibleToMakeMember(admin);
 
 		// "admin" 이 회원가입 하기 위해서 추가로 체크해야 하는 작업들
 	}

@@ -12,14 +12,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class StudentService extends MemberService {
+public class StudentService implements MemberAuthService<Student>, MemberService<Student> {
 
 	private final StudentRepository studentRepository;
 
 	private final PasswordEncoder passwordEncoder;
 
 	public StudentService(StudentRepository studentRepository, @Lazy PasswordEncoder passwordEncoder) {
-		super(passwordEncoder);
 		this.studentRepository = studentRepository;
 		this.passwordEncoder = passwordEncoder;
 	}
