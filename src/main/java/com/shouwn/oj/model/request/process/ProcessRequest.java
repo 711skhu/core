@@ -11,6 +11,6 @@ import lombok.Setter;
 public class ProcessRequest {
 	private String sourceCode;
 	private String language;
-	private List<TestCase> testcases;
+	private List<TestCase> testCases;
 	private long pk;
 }
