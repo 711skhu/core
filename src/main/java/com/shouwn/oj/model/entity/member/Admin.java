@@ -6,10 +6,8 @@ import java.util.List;
 import javax.persistence.*;
 
 import com.shouwn.oj.model.entity.problem.Course;
-import com.shouwn.oj.model.entity.problem.Problem;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.C;
 
 @Getter
 @Setter
@@ -51,7 +49,7 @@ public class Admin extends Member {
 	}
 
 	// update course
-	public Course updateCourse(Long courseId, String courseName, String courseDescription, List<Problem> problems){
+	public Course updateCourse(Long courseId, String courseName, String courseDescription){
 		Course course=null;
 
 		for(Course c : courses){
@@ -64,13 +62,12 @@ public class Admin extends Member {
 		// update
 		course.setName(courseName);
 		course.setDescription(courseDescription);
-		course.setProblems(problems);
 
 		return course;
 	}
 
 	// active course
-	public void activeCourse(Long adminId, Long courseId, Boolean enabled){
+	public void activeCourse(Long courseId, Boolean enabled){
 
 	}
 
