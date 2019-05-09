@@ -1,12 +1,15 @@
 package com.shouwn.oj.model.entity.member;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.persistence.*;
 
 import com.shouwn.oj.model.entity.problem.Course;
+import com.shouwn.oj.model.entity.problem.Problem;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.C;
 
 @Getter
 @Setter
@@ -29,6 +32,7 @@ public class Admin extends Member {
 		super(username, password, name, email);
 	}
 
+	// make course
 	public Course makeCourse(String courseName, String courseDescription) throws EntityExistsException {
 		if (courses.stream().anyMatch(c -> StringUtils.equals(c.getName(), courseName))) {
 			throw new EntityExistsException(courseName + " 라는 이름의 강의를 이미 만들었습니다.");
@@ -44,5 +48,43 @@ public class Admin extends Member {
 		courses.add(course);
 
 		return course;
+	}
+
+	// update course
+	public Course updateCourse(Long courseId, String courseName, String courseDescription, List<Problem> problems){
+		Course course=null;
+
+		for(Course c : courses){
+			if(c.getId().equals(courseId)){
+				course = c;
+				break;
+			}
+		}
+
+		// update
+		course.setName(courseName);
+		course.setDescription(courseDescription);
+		course.setProblems(problems);
+
+		return course;
+	}
+
+	// active course
+	public void activeCourse(Long adminId, Long courseId, Boolean enabled){
+
+	}
+
+	// delete course
+	public void deleteCourse(Long courseId){
+
+		for(Iterator<Course> it = courses.iterator(); it.hasNext();){
+			Course course = it.next();
+
+			if(course.getId().equals(courseId)){
+				it.remove();
+				break;
+			}
+		}
+
 	}
 }
