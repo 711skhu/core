@@ -1,6 +1,6 @@
-package com.shouwn.oj.security;
+package com.shouwn.oj.config.security;
 
-import com.shouwn.oj.config.jwt.JwtProperties;
+import com.shouwn.oj.security.JwtProperties;
 
 public class JwtTestProperties implements JwtProperties {
 

@@ -11,8 +11,7 @@ public interface KotlinStyle<T> {
 	 *
 	 * @param block this 객체를 변환할 함수
 	 * @return 변환된 결과
-	 * @throws ClassCastException if the object is not
-	 * null and is not assignable to the type T.
+	 * @throws ClassCastException if the object is not null and is not assignable to the type T.
 	 */
 	@SuppressWarnings("unchecked")
 	default <R> R let(Function<T, R> block) {
@@ -26,8 +25,7 @@ public interface KotlinStyle<T> {
 	 *
 	 * @param block this 객체를 변환할 함수
 	 * @return 변환된 결과
-	 * @throws ClassCastException if the object is not
-	 * null and is not assignable to the type T.
+	 * @throws ClassCastException if the object is not null and is not assignable to the type T.
 	 */
 	@SuppressWarnings("unchecked")
 	default T apply(Consumer<T> block) {

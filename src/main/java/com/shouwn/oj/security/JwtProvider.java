@@ -3,7 +3,6 @@ package com.shouwn.oj.security;
 import java.security.Key;
 import java.util.Date;
 
-import com.shouwn.oj.config.jwt.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -32,12 +31,12 @@ public class JwtProvider {
 	}
 
 	public Long getMemberIdFromJwt(String token) throws JwtException, IllegalArgumentException {
-			Claims claims = Jwts.parser()
-					.setSigningKey(secretKey)
-					.parseClaimsJws(token)
-					.getBody();
+		Claims claims = Jwts.parser()
+				.setSigningKey(secretKey)
+				.parseClaimsJws(token)
+				.getBody();
 
-			return Long.parseLong(claims.getSubject());
+		return Long.parseLong(claims.getSubject());
 	}
 
 }
