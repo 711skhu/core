@@ -8,6 +8,8 @@ import com.shouwn.oj.repository.problem.CourseRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Transactional
 @Service
 public class CourseService {
@@ -20,5 +22,9 @@ public class CourseService {
 
 	public Course findCourseById(Long id) {
 		return courseRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+	}
+
+	public List<Course> findCourseByAdminId(Long adminId){
+		return courseRepository.findByProfessorId(adminId);
 	}
 }

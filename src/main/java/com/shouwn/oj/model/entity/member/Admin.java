@@ -1,5 +1,6 @@
 package com.shouwn.oj.model.entity.member;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +33,7 @@ public class Admin extends Member {
 
 	// make course
 	public Course makeCourse(String courseName, String courseDescription) throws EntityExistsException {
+
 		if (courses.stream().anyMatch(c -> StringUtils.equals(c.getName(), courseName))) {
 			throw new EntityExistsException(courseName + " 라는 이름의 강의를 이미 만들었습니다.");
 		}
@@ -67,8 +69,29 @@ public class Admin extends Member {
 	}
 
 	// active course
-	public void activeCourse(Long courseId, Boolean enabled){
+	public Course activeCourse(Long courseId, Boolean enabled){
+		// 해당 강좌의 enalbed필드를 넘어온 값으로 set한다.
+		// 이 때, enabled값이 true면 활성화이다. 강좌를 활성화할때, 강좌 엔티티에서 활성화하는 시간을 저장한다.
+		// enabled값이 false면 비활성화이다. 강좌를 비활성화하면, 강좌에 속한 학생들을 지운다.
 
+		Course course = null;
+
+		for(Course c : courses){
+			if(c.getId().equals(courseId)){
+				course = c;
+				break;
+			}
+		}
+
+		if(enabled.equals(true)){
+			course.setEnabled(true);
+			course.setActiveDate(LocalDateTime.now());
+		}else if(enabled.equals(false)){
+			course.setEnabled(false);
+			course.getStudents().clear();
+		}
+
+		return course;
 	}
 
 	// delete course

@@ -1,5 +1,6 @@
 package com.shouwn.oj.model.entity.problem;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
@@ -29,6 +30,9 @@ public class Course extends BaseEntity {
 
 	@Column(nullable = false)
 	private Boolean enabled;
+
+	@Column(name = "active_date")
+	private LocalDateTime activeDate;
 
 	@ManyToOne
 	@JoinColumn(name = "professor_id")
