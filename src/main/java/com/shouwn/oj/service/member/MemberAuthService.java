@@ -19,14 +19,14 @@ public interface MemberAuthService<T extends Member> extends MemberService<T> {
 	default void checkPossibleToMakeMember(T member)
 			throws UsernameExistException, PasswordStrengthLeakException, EmailExistException {
 		if (member == null) {
-			throw new IllegalArgumentException("매개변수로 들어온 admin 이 null 입니다.");
+			throw new IllegalArgumentException("매개변수로 들어온 member 가 null 입니다.");
 		}
 
 		if (isRegisteredUsername(member.getUsername())) {
 			throw new UsernameExistException(member.getUsername() + " 은 이미 등록된 아이디입니다.");
 		}
 
-		if (isPasswordStrengthGood(member.getPassword())) {
+		if (isPasswordStrengthWeak(member.getPassword())) {
 			throw new PasswordStrengthLeakException("비밀번호 강도가 약합니다.");
 		}
 
@@ -41,8 +41,8 @@ public interface MemberAuthService<T extends Member> extends MemberService<T> {
 	 * @param rawPassword 인코딩되지 않은 비밀번호
 	 * @return 비밀번호 강도를 만족했는지 여부
 	 */
-	default boolean isPasswordStrengthGood(String rawPassword) {
-		return rawPassword.length() > 8;
+	default boolean isPasswordStrengthWeak(String rawPassword) {
+		return rawPassword.length() <= 8;
 	}
 
 	boolean isCorrectPassword(Member member, String rawPassword);
