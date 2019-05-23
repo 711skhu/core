@@ -10,13 +10,14 @@ import com.shouwn.oj.repository.member.StudentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -44,6 +45,24 @@ public class StudentServiceTest {
 				.password("test12345")
 				.email("test@skhu.ac.kr")
 				.build();
+	}
+
+	@Test
+	public void makeStudentSuccess() {
+		when(studentRepository.findByUsername(any())).thenReturn(Optional.empty());
+
+		studentService.makeStudent(this.student.getName(),
+				this.student.getUsername(),
+				this.student.getPassword(),
+				this.student.getEmail());
+
+		final ArgumentCaptor<Student> saveCaptor = ArgumentCaptor.forClass(Student.class);
+
+		verify(studentRepository).save(saveCaptor.capture());
+		verify(passwordEncoder).encode(any());
+
+		assertEquals(this.student.getUsername(), saveCaptor.getValue().getUsername());
+		assertNotEquals(this.student.getPassword(), saveCaptor.getValue().getPassword());
 	}
 
 	@Test
