@@ -49,7 +49,10 @@ public class StudentServiceTest {
 
 	@Test
 	public void makeStudentSuccess() {
+		String encodedPassword = "encoded";
+
 		when(studentRepository.findByUsername(any())).thenReturn(Optional.empty());
+		when(passwordEncoder.encode(any())).thenReturn(encodedPassword);
 
 		studentService.makeStudent(this.student.getName(),
 				this.student.getUsername(),
@@ -59,10 +62,10 @@ public class StudentServiceTest {
 		final ArgumentCaptor<Student> saveCaptor = ArgumentCaptor.forClass(Student.class);
 
 		verify(studentRepository).save(saveCaptor.capture());
-		verify(passwordEncoder).encode(any());
+		verify(passwordEncoder).encode(this.student.getPassword());
 
 		assertEquals(this.student.getUsername(), saveCaptor.getValue().getUsername());
-		assertNotEquals(this.student.getPassword(), saveCaptor.getValue().getPassword());
+		assertEquals(encodedPassword, saveCaptor.getValue().getPassword());
 	}
 
 	@Test
