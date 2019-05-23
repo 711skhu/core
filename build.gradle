@@ -33,7 +33,5 @@ dependencies {
 
     // For ConfigurationProperties
     compile "org.springframework.boot:spring-boot-configuration-processor"
-
-    // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '2.18.3'
+    
 }
