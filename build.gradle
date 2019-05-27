@@ -33,4 +33,5 @@ dependencies {
 
     // For ConfigurationProperties
     compile "org.springframework.boot:spring-boot-configuration-processor"
+    
 }
