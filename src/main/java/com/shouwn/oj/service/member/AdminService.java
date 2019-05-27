@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+//TODO : 관례에 어긋남. Admin 보다는 Professor 바람직.
+
 @Service
 public class AdminService implements MemberAuthService<Admin>, MemberService<Admin> {
 
