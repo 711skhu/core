@@ -10,13 +10,13 @@ jar {
 }
 
 dependencies {
-    
+
     // security
     compile 'org.springframework.boot:spring-boot-starter-security'
-    
+
     // web
     compile 'org.springframework.boot:spring-boot-starter-web'
-    
+
     // jpa
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
     compile 'com.querydsl:querydsl-jpa'
@@ -33,5 +33,5 @@ dependencies {
 
     // For ConfigurationProperties
     compile "org.springframework.boot:spring-boot-configuration-processor"
-    
+
 }
