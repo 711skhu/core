@@ -1,6 +1,7 @@
 package com.shouwn.oj.service.member;
 
-import com.shouwn.oj.exception.member.*;
+import java.util.Optional;
+
 import com.shouwn.oj.model.entity.member.Admin;
 import com.shouwn.oj.model.entity.member.Member;
 import com.shouwn.oj.repository.member.AdminRepository;
@@ -31,16 +32,12 @@ public class AdminService implements MemberAuthService<Admin>, MemberService<Adm
 	 * @param rawPassword 관리자 패스워드 (인코딩 되지 않은)
 	 * @param email       관리자 이메일
 	 * @return 생성된 관리자 객체
-	 * @throws MemberException UsernameExistException 이미 아이디가 존재할 때 발생하는 예외
-	 *                         PasswordStrengthLeakException 비밀번호가 약할 때 발생하는 예외
-	 *                         EmailExistException 이메일이 이미 존재할 때 발생하는 예외
 	 */
 	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public Admin makeAdmin(String name,
 						   String username,
 						   String rawPassword,
-						   String email) throws MemberException {
-
+						   String email) {
 		Admin admin = Admin.builder()
 				.name(name)
 				.username(username)
@@ -59,34 +56,27 @@ public class AdminService implements MemberAuthService<Admin>, MemberService<Adm
 	 * 관리자 계정을 만들 수 있는지 체크하는 메소드
 	 *
 	 * @param admin 만들 관리자 객체
-	 * @throws UsernameExistException        아이디가 이미 등록되었을 때 발생하는 예외
-	 * @throws PasswordStrengthLeakException 비밀번호 강도가 약할 때 발생하는 예외
-	 * @throws EmailExistException           이메일이 이미 등록되었을 때 발생하는 예외
 	 */
 	@Override
-	public void checkPossibleToMakeMember(Admin admin)
-			throws UsernameExistException, PasswordStrengthLeakException, EmailExistException {
+	public void checkPossibleToMakeMember(Admin admin) {
 		MemberAuthService.super.checkPossibleToMakeMember(admin);
 
 		// "admin" 이 회원가입 하기 위해서 추가로 체크해야 하는 작업들
 	}
 
 	@Override
-	public Admin findById(Long id) throws IdNotExistException {
-		return adminRepository.findById(id)
-				.orElseThrow(() -> new IdNotExistException("User not found with id"));
+	public Optional<Admin> findById(Long id) {
+		return adminRepository.findById(id);
 	}
 
 	@Override
-	public Admin findByUsername(String username) throws UsernameNotExistException {
-		return adminRepository.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotExistException("User not found with username"));
+	public Optional<Admin> findByUsername(String username) {
+		return adminRepository.findByUsername(username);
 	}
 
 	@Override
-	public Admin findByEmail(String email) throws EmailNotExistException {
-		return adminRepository.findByEmail(email)
-				.orElseThrow(() -> new EmailNotExistException("User not found with email"));
+	public Optional<Admin> findByEmail(String email) {
+		return adminRepository.findByEmail(email);
 	}
 
 	@Override

@@ -2,9 +2,8 @@ package com.shouwn.oj.service.member;
 
 import java.util.Optional;
 
-import com.shouwn.oj.exception.member.EmailExistException;
-import com.shouwn.oj.exception.member.PasswordStrengthLeakException;
-import com.shouwn.oj.exception.member.UsernameExistException;
+import com.shouwn.oj.exception.AlreadyExistException;
+import com.shouwn.oj.exception.IllegalStateException;
 import com.shouwn.oj.model.entity.member.Student;
 import com.shouwn.oj.repository.member.StudentRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,9 +16,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
@@ -69,10 +70,10 @@ public class StudentServiceTest {
 	}
 
 	@Test
-	public void makeStudentThrowsUsernameExistException() {
+	public void makeStudentThrowsAlreadyExistExceptionByUsername() {
 		when(studentRepository.findByUsername(any())).thenReturn(Optional.of(this.student));
 
-		assertThrows(UsernameExistException.class,
+		assertThrows(AlreadyExistException.class,
 				() -> studentService.makeStudent(this.student.getName(),
 						this.student.getUsername(),
 						this.student.getPassword(),
@@ -83,11 +84,11 @@ public class StudentServiceTest {
 	}
 
 	@Test
-	public void makeStudentThrowsEmailExistException() {
+	public void makeStudentThrowsAlreadyExistExceptionByEmail() {
 		when(studentRepository.findByUsername(any())).thenReturn(Optional.empty());
 		when(studentRepository.findByEmail(any())).thenReturn(Optional.of(this.student));
 
-		assertThrows(EmailExistException.class,
+		assertThrows(AlreadyExistException.class,
 				() -> studentService.makeStudent(this.student.getName(),
 						this.student.getUsername(),
 						this.student.getPassword(),
@@ -99,12 +100,12 @@ public class StudentServiceTest {
 	}
 
 	@Test
-	public void makeStudentThrowsPasswordStrengthLeakException() {
+	public void makeStudentThrowsIllegalStateException() {
 		when(studentRepository.findByUsername(any())).thenReturn(Optional.empty());
 
 		this.student.setPassword("test123");
 
-		assertThrows(PasswordStrengthLeakException.class,
+		assertThrows(IllegalStateException.class,
 				() -> studentService.makeStudent(this.student.getName(),
 						this.student.getUsername(),
 						this.student.getPassword(),
