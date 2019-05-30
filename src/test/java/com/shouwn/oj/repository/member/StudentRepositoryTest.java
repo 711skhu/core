@@ -1,7 +1,12 @@
 package com.shouwn.oj.repository.member;
 
+import java.util.List;
+
 import com.shouwn.oj.config.repository.RepositoryTestConfig;
+import com.shouwn.oj.model.entity.member.Admin;
 import com.shouwn.oj.model.entity.member.Student;
+import com.shouwn.oj.model.entity.problem.Course;
+import com.shouwn.oj.repository.problem.CourseRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +27,12 @@ public class StudentRepositoryTest {
 
 	@Autowired
 	private StudentRepository studentRepository;
+
+	@Autowired
+	private AdminRepository adminRepository;
+
+	@Autowired
+	private CourseRepository courseRepository;
 
 	private Student student;
 
@@ -108,5 +119,36 @@ public class StudentRepositoryTest {
 		assertEquals(student, findStudent);
 
 		Assertions.assertFalse(studentRepository.findByEmail("illegalEmail").isPresent());
+	}
+
+	@Test
+	public void MemberCourseSaveTest() {
+		Student s1 = studentRepository.save(student);
+
+		int beforeCoursesSize = s1.getCourses().size();
+
+		Admin p = Admin.builder()
+				.username("junit_tester_1")
+				.password("test123")
+				.name("tester")
+				.email("test@gmail.com")
+				.build();
+		Admin professor = adminRepository.save(p);
+
+		Course c = Course.builder()
+				.name("test")
+				.description("test")
+				.enabled(true)
+				.professor(professor)
+				.build();
+		Course course = courseRepository.save(c);
+
+		List<Course> courses = student.getCourses();
+		courses.add(course);
+		student.setCourses(courses);
+
+		Student s2 = studentRepository.save(student);
+
+		Assertions.assertEquals(beforeCoursesSize + 1, s2.getCourses().size());
 	}
 }
