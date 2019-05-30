@@ -21,7 +21,7 @@ public class CourseService {
 		return courseRepository.findById(courseId);
 	}
 
-	public List<Course> findAll() {
-		return courseRepository.findAll();
+	public List<Course> findCoursesByEnabled() {
+		return courseRepository.findCoursesByEnabled(true);
 	}
 }
