@@ -1,5 +1,6 @@
 package com.shouwn.oj.service.problem;
 
+import java.util.List;
 import javax.persistence.EntityNotFoundException;
 
 import com.shouwn.oj.model.entity.problem.Course;
@@ -7,8 +8,6 @@ import com.shouwn.oj.repository.problem.CourseRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Transactional
 @Service
@@ -24,7 +23,11 @@ public class CourseService {
 		return courseRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 	}
 
-	public List<Course> findCourseByAdminId(Long adminId){
+	public List<Course> findCourseByAdminId(Long adminId) {
 		return courseRepository.findByProfessorId(adminId);
+	}
+
+	public void saveCourse(Course course) {
+		courseRepository.save(course);
 	}
 }
