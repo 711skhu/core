@@ -145,7 +145,9 @@ public class StudentRepositoryTest {
 
 		List<Course> courses = student.getCourses();
 		courses.add(course);
-		student.setCourses(courses);
+
+		List<Student> students = course.getStudents();
+		students.add(student);
 
 		Student s2 = studentRepository.save(student);
 

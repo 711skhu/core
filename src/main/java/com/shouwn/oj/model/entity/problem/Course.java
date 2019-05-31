@@ -11,7 +11,6 @@ import lombok.*;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = {"id"}, callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 
 @Entity
