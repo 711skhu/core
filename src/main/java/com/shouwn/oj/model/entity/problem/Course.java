@@ -51,4 +51,14 @@ public class Course extends BaseEntity {
 		this.enabled = enabled;
 		this.professor = professor;
 	}
+
+	public void activeCourse(Boolean enabled){
+		this.enabled = enabled;
+
+		if (enabled == true) {
+			this.activeDate = LocalDateTime.now();
+		} else if (enabled == false) {
+			this.getStudents().clear();
+		}
+	}
 }

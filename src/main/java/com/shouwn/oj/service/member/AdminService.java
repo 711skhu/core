@@ -83,4 +83,9 @@ public class AdminService implements MemberAuthService<Admin>, MemberService<Adm
 	public boolean isCorrectPassword(Member member, String rawPassword) {
 		return passwordEncoder.matches(rawPassword, member.getPassword());
 	}
+
+	@Transactional
+	public void updateAdmin(Admin admin){
+		adminRepository.save(admin);
+	}
 }

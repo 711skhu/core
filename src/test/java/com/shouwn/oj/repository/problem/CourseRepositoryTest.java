@@ -1,5 +1,7 @@
 package com.shouwn.oj.repository.problem;
 
+import java.util.List;
+
 import com.shouwn.oj.config.repository.RepositoryTestConfig;
 import com.shouwn.oj.model.entity.member.Admin;
 import com.shouwn.oj.model.entity.problem.Course;
@@ -123,4 +125,31 @@ public class CourseRepositoryTest {
 		Assertions.assertFalse(courseRepository.findById(newCourse.getId()).isPresent());
 	}
 
+	@Test
+	public void findCoursesByEnable() {
+		Admin professor = Admin.builder()
+				.username("junit_tester")
+				.password("test123")
+				.name("tester")
+				.email("test@gmail.com")
+				.build();
+
+		adminRepository.save(professor);
+
+		List<Course> enabledCourses = courseRepository.findCoursesByEnabled(true);
+
+		int beforeCoursesSize = enabledCourses.size();
+
+		Course course = Course.builder()
+				.name("junit_test")
+				.description("test")
+				.enabled(true)
+				.professor(professor)
+				.build();
+		courseRepository.save(course);
+
+		enabledCourses = courseRepository.findCoursesByEnabled(true);
+
+		Assertions.assertEquals(beforeCoursesSize + 1, enabledCourses.size());
+	}
 }

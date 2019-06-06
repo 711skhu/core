@@ -81,6 +81,10 @@ public class StudentService implements MemberAuthService<Student>, MemberService
 		return studentRepository.findByEmail(email);
 	}
 
+	public Student save(Student student) {
+		return studentRepository.save(student);
+	}
+
 	@Override
 	public boolean isCorrectPassword(Member member, String rawPassword) {
 		return passwordEncoder.matches(rawPassword, member.getPassword());

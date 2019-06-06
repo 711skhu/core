@@ -1,7 +1,8 @@
 package com.shouwn.oj.service.problem;
 
 import java.util.List;
-import javax.persistence.EntityNotFoundException;
+
+import java.util.Optional;
 
 import com.shouwn.oj.model.entity.problem.Course;
 import com.shouwn.oj.repository.problem.CourseRepository;
@@ -19,15 +20,15 @@ public class CourseService {
 		this.courseRepository = courseRepository;
 	}
 
-	public Course findCourseById(Long id) {
-		return courseRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-	}
-
-	public List<Course> findCourseByAdminId(Long adminId) {
-		return courseRepository.findByProfessorId(adminId);
-	}
-
 	public void saveCourse(Course course) {
 		courseRepository.save(course);
+	}
+
+	public Optional<Course> findCourseById(Long courseId) {
+		return courseRepository.findById(courseId);
+	}
+
+	public List<Course> findCoursesByEnabled() {
+		return courseRepository.findCoursesByEnabled(true);
 	}
 }
