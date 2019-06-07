@@ -52,7 +52,7 @@ public class Course extends BaseEntity {
 		this.professor = professor;
 	}
 
-	public void activeCourse(Boolean enabled){
+	public void activeCourse(Boolean enabled) {
 		this.enabled = enabled;
 
 		if (enabled == true) {

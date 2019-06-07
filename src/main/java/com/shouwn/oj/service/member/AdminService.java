@@ -85,7 +85,7 @@ public class AdminService implements MemberAuthService<Admin>, MemberService<Adm
 	}
 
 	@Transactional
-	public void updateAdmin(Admin admin){
+	public void updateAdmin(Admin admin) {
 		adminRepository.save(admin);
 	}
 }
