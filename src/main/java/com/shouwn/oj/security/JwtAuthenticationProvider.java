@@ -1,8 +1,8 @@
 package com.shouwn.oj.security;
 
 import java.util.Collections;
+import java.util.Optional;
 
-import com.shouwn.oj.exception.member.IdNotExistException;
 import com.shouwn.oj.model.entity.member.Member;
 import com.shouwn.oj.service.member.MemberAuthService;
 import org.apache.commons.lang3.reflect.TypeUtils;
@@ -16,9 +16,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
-	private final MemberAuthService memberAuthService;
+	private final MemberAuthService<? extends Member> memberAuthService;
 
-	public JwtAuthenticationProvider(MemberAuthService memberAuthService) {
+	public JwtAuthenticationProvider(MemberAuthService<? extends Member> memberAuthService) {
 		this.memberAuthService = memberAuthService;
 	}
 
@@ -40,15 +40,15 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 		JwtAuthenticationToken auth = (JwtAuthenticationToken) authentication;
 		Long memberId = auth.getMemberId();
 
-		try {
-			Member member = memberAuthService.findById(memberId);
+		Optional<? extends Member> member = memberAuthService.findById(memberId);
 
-			return new UsernamePasswordAuthenticationToken(
-					member.getUsername(), member.getPassword(),
-					Collections.singletonList(new SimpleGrantedAuthority(member.getRole())));
-		} catch (IdNotExistException e) {
+		if (!member.isPresent()) {
 			throw new UsernameNotFoundException(memberId + " 로 유저를 찾을 수 없습니다.");
 		}
+
+		return new UsernamePasswordAuthenticationToken(
+				member.get().getUsername(), member.get().getPassword(),
+				Collections.singletonList(new SimpleGrantedAuthority(member.get().getRole())));
 	}
 
 	@Override
