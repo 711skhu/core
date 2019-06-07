@@ -13,14 +13,12 @@ public class ProcessRequest {
 
 	private String sourceCode;
 	private String language;
-	private List<TestCase> testCases;
-	private long pk;
+	private long problemDetailId;
 
 	@Builder
-	public ProcessRequest(String sourceCode, String language, List<TestCase> testCases, long pk) {
+	public ProcessRequest(String sourceCode, String language, long problemDetailId) {
 		this.sourceCode = sourceCode;
 		this.language = language;
-		this.testCases = testCases;
-		this.pk = pk;
+		this.problemDetailId = problemDetailId;
 	}
 }
