@@ -23,7 +23,7 @@ import static com.shouwn.oj.model.enums.ProblemType.HOMEWORK;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ProblemReposirotyTest {
+public class ProblemRepositoryTest {
 
 	@Autowired
 	private AdminRepository adminRepository;
