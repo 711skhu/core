@@ -1,44 +1,102 @@
 package com.shouwn.oj.security;
 
-import com.shouwn.oj.config.security.JwtTestConfig;
-import io.jsonwebtoken.JwtException;
+import java.util.Arrays;
+
+import com.shouwn.oj.config.security.JwtTestProperties;
+import com.shouwn.oj.exception.IllegalStateException;
+import com.shouwn.oj.exception.InvalidParameterException;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+class JwtProviderTest {
 
-@ExtendWith(SpringExtension.class)
-@Import(JwtTestConfig.class)
-@SpringBootTest(classes = JwtProvider.class)
-public class JwtProviderTest {
+	private JwtTestProperties jwtTestProperties;
 
-	@Autowired
 	private JwtProvider jwtProvider;
 
+	@BeforeEach
+	void init() {
+		this.jwtTestProperties = new JwtTestProperties();
+		this.jwtProvider = new JwtProvider(jwtTestProperties);
+	}
+
 	@Test
-	public void getMemberIdFromJwtToSuccess() {
+	void arrayLengthTest() {
+		String[] strings = Arrays.stream("".split(","))
+				.filter(StringUtils::isNotBlank)
+				.toArray(String[]::new);
+
+		Assertions.assertEquals(0, strings.length);
+	}
+
+	@Test
+	void getContextFromJwtToSuccess() {
 		Long id = 10L;
 		String token = jwtProvider.generateJwt(id);
 
-		Assertions.assertEquals(jwtProvider.getMemberIdFromJwt(token), id);
+		JwtContext context = jwtProvider.getContextFromJwt(token);
+
+		Assertions.assertEquals(context.getMemberId(), id);
+		Assertions.assertEquals(0, context.getRoles().length);
+
+		String role = "ADMIN";
+		token = jwtProvider.generateJwt(id, role);
+
+		context = jwtProvider.getContextFromJwt(token);
+
+		Assertions.assertEquals(context.getMemberId(), id);
+		Assertions.assertEquals(context.getRoles()[0], role);
 	}
 
 	@Test
-	public void getMemberIdFromJwtThrowsJwtException() {
-		Assertions.assertThrows(JwtException.class, () ->
-				jwtProvider.getMemberIdFromJwt("token")
+	void generateJwtByContext() {
+		Long id = 10L;
+		String role = "TEST";
+
+		JwtContext context = new JwtContext(false, id, role);
+
+		String token = jwtProvider.generateJwt(context);
+
+		JwtContext providedContext = jwtProvider.getContextFromJwt(token);
+
+		Assertions.assertEquals(context, providedContext);
+	}
+
+	@Test
+	void getContextFromJwtThrowsInvalidParameter() {
+		Assertions.assertThrows(InvalidParameterException.class, () ->
+				jwtProvider.getContextFromJwt("token")
 		);
 	}
 
 	@Test
-	public void getMemberIdFromJwtThrowsIllegalArgumentException() {
-		Assertions.assertThrows(IllegalArgumentException.class, () ->
-				jwtProvider.getMemberIdFromJwt(null)
+	void getContextFromJwtThrowsIllegalStateException() {
+		jwtTestProperties.setExpirationMs(2);
+
+		String token = jwtProvider.generateJwt(10L);
+
+		Assertions.assertThrows(IllegalStateException.class, () ->
+				jwtProvider.getContextFromJwt(token)
 		);
 	}
 
+	@Test
+	void refreshTokenTest() {
+		Long memberId = 10L;
+		String role = "TEST";
+
+		String token = jwtProvider.generateRefreshJwt(memberId, role);
+
+		JwtContext context = jwtProvider.getContextFromJwt(token);
+
+		Assertions.assertTrue(context.isRefreshToken());
+
+		token = jwtProvider.generateJwt(memberId, role);
+
+		context = jwtProvider.getContextFromJwt(token);
+
+		Assertions.assertFalse(context.isRefreshToken());
+	}
 }

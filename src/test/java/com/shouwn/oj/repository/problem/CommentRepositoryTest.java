@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -23,9 +22,7 @@ import static com.shouwn.oj.model.enums.ProblemType.PRACTICE;
 
 @ExtendWith(SpringExtension.class)
 @Import(RepositoryTestConfig.class)
-
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CommentRepositoryTest {
 
 	@Autowired
@@ -49,7 +46,7 @@ public class CommentRepositoryTest {
 	@Test
 	public void saveAndFind() {
 		Student student = Student.builder()
-				.username("junit_tester")
+				.username("junit_tester_student")
 				.password("test123")
 				.name("tester")
 				.email("test@gmail.com")
@@ -58,7 +55,7 @@ public class CommentRepositoryTest {
 		studentRepository.save(student);
 
 		Admin professor = Admin.builder()
-				.username("junit_tester")
+				.username("junit_tester_admin")
 				.password("test123")
 				.name("tester")
 				.email("test@gmail.com")
@@ -122,7 +119,7 @@ public class CommentRepositoryTest {
 	@Test
 	public void update() {
 		Student student = Student.builder()
-				.username("junit_tester")
+				.username("junit_tester_student")
 				.password("test123")
 				.name("tester")
 				.email("test@gmail.com")
@@ -131,7 +128,7 @@ public class CommentRepositoryTest {
 		studentRepository.save(student);
 
 		Admin professor = Admin.builder()
-				.username("junit_tester")
+				.username("junit_tester_admin")
 				.password("test123")
 				.name("tester")
 				.email("test@gmail.com")
@@ -197,7 +194,7 @@ public class CommentRepositoryTest {
 	@Test
 	public void delete() {
 		Student student = Student.builder()
-				.username("junit_tester")
+				.username("junit_tester_student")
 				.password("test123")
 				.name("tester")
 				.email("test@gmail.com")
@@ -206,7 +203,7 @@ public class CommentRepositoryTest {
 		studentRepository.save(student);
 
 		Admin professor = Admin.builder()
-				.username("junit_tester")
+				.username("junit_tester_admin")
 				.password("test123")
 				.name("tester")
 				.email("test@gmail.com")
