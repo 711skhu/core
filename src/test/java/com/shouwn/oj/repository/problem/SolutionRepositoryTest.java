@@ -248,82 +248,71 @@ public class SolutionRepositoryTest {
 	}
 
 	@Test
-	public void findSolutionsByProblemDetailOrderById() {
-		Admin professor = Admin.builder()
-				.username("junit_tester")
-				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
-				.build();
-
-		adminRepository.save(professor);
-
+	public void findSolutionsByProblemDetailAndMember() {
 		Student student = Student.builder()
-				.username("junit_tester")
-				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
+				.username("test_student")
+				.name("test_student")
+				.password("test1234")
+				.email("test@skhu.ac.kr")
 				.build();
 
 		studentRepository.save(student);
 
-		Course newCourse = Course.builder()
-				.name("junit_test")
+		Admin professor = Admin.builder()
+				.name("test_professor")
+				.username("test_professor")
+				.password("test1234")
+				.email("prfssTest@skhu.ac.kr")
+				.build();
+
+		adminRepository.save(professor);
+
+		Course course = Course.builder()
+				.name("test")
 				.description("test")
 				.enabled(true)
 				.professor(professor)
 				.build();
 
-		courseRepository.save(newCourse);
+		courseRepository.save(course);
+
+		student.getCourses().add(course);
+		professor.getCourses().add(course);
 
 		Problem problem = Problem.builder()
+				.title("test")
 				.type(HOMEWORK)
-				.title("junit_test")
-				.course(newCourse)
+				.course(course)
 				.build();
 
 		problemRepository.save(problem);
 
+		course.getProblems().add(problem);
+
 		ProblemDetail problemDetail = ProblemDetail.builder()
-				.title("junit_test")
-				.content("junit-test")
 				.sequence(1)
+				.title("test")
+				.content("test")
 				.problem(problem)
 				.build();
 
 		problemDetailRepository.save(problemDetail);
 
-		Solution solution1 = Solution.builder()
-				.content("junit_test")
-				.score(1)
-				.member(student)
-				.problemDetail(problemDetail)
-				.build();
-
-		solutionRepository.save(solution1);
-
-		Solution solution2 = Solution.builder()
-				.content("junit_test")
-				.score(1)
-				.member(student)
-				.problemDetail(problemDetail)
-				.build();
-
-		Solution s = solutionRepository.save(solution2);
-
-		problemDetail.getSolutions().add(solution1);
-		problemDetail.getSolutions().add(solution2);
-
 		problem.getProblemDetails().add(problemDetail);
 
-		newCourse.getProblems().add(problem);
+		Solution solution = Solution.builder()
+				.content("test")
+				.score(1)
+				.member(student)
+				.problemDetail(problemDetail)
+				.build();
 
-		student.getSolutions().add(solution1);
-		student.getSolutions().add(solution2);
+		Solution s = solutionRepository.save(solution);
 
-		professor.getCourses().add(newCourse);
+		problemDetail.getSolutions().add(solution);
+		student.getSolutions().add(solution);
 
-		List<Solution> solutions = solutionRepository.findSolutionsByProblemDetailOrderByIdDesc(problemDetail);
+		List<Solution> solutions = solutionRepository.findSolutionsByProblemDetailAndMember(problemDetail, student);
 
 		Assertions.assertEquals(s, solutions.get(0));
 	}
