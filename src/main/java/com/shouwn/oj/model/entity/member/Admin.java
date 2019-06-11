@@ -2,6 +2,7 @@ package com.shouwn.oj.model.entity.member;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -17,7 +18,7 @@ import lombok.*;
 @DiscriminatorValue("ADMIN")
 public class Admin extends Member {
 
-	@OneToMany(mappedBy = "professor")
+	@OneToMany(mappedBy = "professor", cascade = CascadeType.ALL)
 	private List<Course> courses = new ArrayList<>();
 
 	@Override

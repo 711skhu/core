@@ -152,5 +152,4 @@ public class CourseRepositoryTest {
 
 		Assertions.assertEquals(beforeCoursesSize + 1, enabledCourses.size());
 	}
-
 }

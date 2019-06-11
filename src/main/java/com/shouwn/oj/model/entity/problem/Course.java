@@ -1,5 +1,6 @@
 package com.shouwn.oj.model.entity.problem;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
@@ -30,6 +31,9 @@ public class Course extends BaseEntity {
 	@Column(nullable = false)
 	private Boolean enabled;
 
+	@Column(name = "active_date")
+	private LocalDateTime activeDate;
+
 	@ManyToOne
 	@JoinColumn(name = "professor_id")
 	private Admin professor;
@@ -46,5 +50,15 @@ public class Course extends BaseEntity {
 		this.description = description;
 		this.enabled = enabled;
 		this.professor = professor;
+	}
+
+	public void activeCourse(Boolean enabled) {
+		this.enabled = enabled;
+
+		if (enabled == true) {
+			this.activeDate = LocalDateTime.now();
+		} else if (enabled == false) {
+			this.getStudents().clear();
+		}
 	}
 }
