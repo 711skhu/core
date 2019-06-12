@@ -13,10 +13,10 @@ import org.springframework.security.core.GrantedAuthority;
 @Getter
 public class JwtAuthenticationToken implements Authentication {
 
-	private final Long memberId;
+	private final String token;
 
-	public JwtAuthenticationToken(Long memberId) {
-		this.memberId = memberId;
+	JwtAuthenticationToken(String token) {
+		this.token = token;
 	}
 
 	@Override

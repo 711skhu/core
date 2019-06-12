@@ -1,11 +1,10 @@
 package com.shouwn.oj.security.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shouwn.oj.model.entity.member.Member;
-import com.shouwn.oj.security.*;
-import com.shouwn.oj.service.member.MemberAuthService;
+import com.shouwn.oj.security.JwtAuthenticationFilter;
+import com.shouwn.oj.security.JwtAuthenticationProvider;
+import com.shouwn.oj.security.JwtProperties;
+import com.shouwn.oj.security.JwtProvider;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,9 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  */
 public abstract class JwtSecurityConfigurerAdapter {
 
-	@Bean(name = "securityMemberAuthService")
-	public abstract MemberAuthService<? extends Member> memberServiceUsingSecurity();
-
 	@Bean
 	public abstract JwtProperties jwtProperties();
 
@@ -28,19 +24,13 @@ public abstract class JwtSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public JwtAuthenticationProvider jwtAuthenticationProvider(
-			@Qualifier("securityMemberAuthService") MemberAuthService<? extends Member> securityMemberAuthService) {
-		return new JwtAuthenticationProvider(securityMemberAuthService);
+	public JwtAuthenticationProvider jwtAuthenticationProvider(JwtProvider jwtProvider) {
+		return new JwtAuthenticationProvider(jwtProvider);
 	}
 
 	@Bean
-	public JwtAuthenticationFilter jwtAuthenticationFilter(JwtProvider jwtProvider, ObjectMapper objectMapper) {
-		return new JwtAuthenticationFilter(jwtProvider, objectMapper);
-	}
-
-	@Bean
-	public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint(ObjectMapper objectMapper) {
-		return new JwtAuthenticationEntryPoint(objectMapper);
+	public JwtAuthenticationFilter jwtAuthenticationFilter() {
+		return new JwtAuthenticationFilter();
 	}
 
 	@Bean
