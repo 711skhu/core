@@ -46,4 +46,20 @@ public class ProblemDetail extends BaseEntity {
 		this.sequence = sequence;
 		this.problem = problem;
 	}
+
+	/** 테스트 케이스를 모두 통과했을 경우(=만점) 점수를 리턴하는 메소드 */
+	public int fullScore() {
+		return getTestCases().size();
+	}
+
+	/** 매개변수로 받아온 Solution 이 만점인지 확인하는 메소드 */
+	public boolean isPerfectScore(Solution solution) {
+		int fullScore = this.fullScore();
+
+		if (fullScore == 0) {
+			throw new IllegalStateException("문제에 테스트 케이스가 없는데 정답을 제출할 수는 없습니다.");
+		}
+
+		return solution.getScore() == fullScore();
+	}
 }

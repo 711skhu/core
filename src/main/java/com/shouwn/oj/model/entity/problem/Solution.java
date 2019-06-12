@@ -40,4 +40,17 @@ public class Solution extends BaseEntity {
 		this.member = member;
 		this.problemDetail = problemDetail;
 	}
+
+	/** 더 높은 점수를 가진 Solution 을 리턴하는 메소드 */
+	public static Solution getBiggerScoreSolution(Solution s1 , Solution s2) {
+		if (s1.getScore() > s2.getScore()) {
+			return s1;
+		} else {
+			return s2;
+		}
+	}
+
+	public boolean isPerfectScore() {
+		return getProblemDetail().isPerfectScore(this);
+	}
 }
