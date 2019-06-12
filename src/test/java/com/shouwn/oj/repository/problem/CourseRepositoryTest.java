@@ -11,16 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @Import(RepositoryTestConfig.class)
-
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CourseRepositoryTest {
 
 	@Autowired
@@ -32,7 +29,7 @@ public class CourseRepositoryTest {
 	@Test
 	public void saveAndFind() {
 		Admin professor = Admin.builder()
-				.username("junit_tester")
+				.username("junit_tester_admin")
 				.password("test123")
 				.name("tester")
 				.email("test@gmail.com")
@@ -152,5 +149,4 @@ public class CourseRepositoryTest {
 
 		Assertions.assertEquals(beforeCoursesSize + 1, enabledCourses.size());
 	}
-
 }

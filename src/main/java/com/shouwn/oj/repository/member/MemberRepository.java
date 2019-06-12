@@ -4,9 +4,9 @@ import java.util.Optional;
 
 import com.shouwn.oj.model.entity.member.Member;
 
-public interface MemberRepository<T extends Member, ID> {
+import org.springframework.data.jpa.repository.JpaRepository;
 
-	Optional<T> findById(ID id);
+public interface MemberRepository<T extends Member, ID> extends JpaRepository<T, ID> {
 
 	Optional<T> findByUsername(String username);
 

@@ -2,8 +2,6 @@ package com.shouwn.oj.security.config;
 
 import java.lang.annotation.*;
 
-import com.shouwn.oj.config.security.JwtSecurityConfig;
-
 import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;

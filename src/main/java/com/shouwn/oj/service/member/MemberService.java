@@ -3,20 +3,37 @@ package com.shouwn.oj.service.member;
 import java.util.Optional;
 
 import com.shouwn.oj.model.entity.member.Member;
+import com.shouwn.oj.repository.member.MemberRepository;
 
-public interface MemberService<T extends Member> {
+public abstract class MemberService<T extends Member> {
 
-	Optional<T> findById(Long id);
+	private final MemberRepository<T, Long> memberRepository;
 
-	Optional<T> findByUsername(String username);
-
-	Optional<T> findByEmail(String email);
-
-	default boolean isRegisteredUsername(String username) {
-		return findByUsername(username).isPresent();
+	protected MemberService(MemberRepository<T, Long> memberRepository) {
+		this.memberRepository = memberRepository;
 	}
 
-	default boolean isRegisteredEmail(String email) {
-		return findByEmail(email).isPresent();
+	public boolean isRegisteredUsername(String username) {
+		return memberRepository.findByUsername(username).isPresent();
+	}
+
+	public boolean isRegisteredEmail(String email) {
+		return memberRepository.findByEmail(email).isPresent();
+	}
+
+	public Optional<T> findById(Long id) {
+		return memberRepository.findById(id);
+	}
+
+	public Optional<T> findByUsername(String username) {
+		return memberRepository.findByUsername(username);
+	}
+
+	public Optional<T> findByEmail(String email) {
+		return memberRepository.findByEmail(email);
+	}
+
+	public T save(T member) {
+		return memberRepository.save(member);
 	}
 }
