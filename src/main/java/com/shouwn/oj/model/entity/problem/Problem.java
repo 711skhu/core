@@ -48,4 +48,10 @@ public class Problem extends BaseEntity {
 		this.endDate = endDate;
 		this.course = course;
 	}
+
+	public int fullScore() {
+		return problemDetails.stream()
+				.map(ProblemDetail::fullScore)
+				.reduce(0, Integer::sum);
+	}
 }
