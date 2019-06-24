@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
 		Map<String, Object> attributes = AnnotationUtils.getAnnotationAttributes(annotation);
 
 		return CommonResponse.builder()
-				.status(HttpStatus.valueOf((int) attributes.get("code")))
+				.status((HttpStatus) attributes.get("code"))
 				.message(e.getMessage())
 				.build();
 	}
