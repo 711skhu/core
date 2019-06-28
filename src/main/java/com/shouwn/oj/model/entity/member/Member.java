@@ -25,6 +25,7 @@ public abstract class Member extends BaseEntity {
 	private Long id;
 
 	@Column(unique = true, updatable = false, nullable = false)
+	@Setter(AccessLevel.NONE)
 	private String username;
 
 	@Column(nullable = false)

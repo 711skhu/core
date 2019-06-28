@@ -1,166 +1,163 @@
 package com.shouwn.oj.repository.problem;
 
 import java.util.List;
+import javax.persistence.EntityManager;
 
 import com.shouwn.oj.config.repository.RepositoryTestConfig;
 import com.shouwn.oj.model.entity.member.Admin;
+import com.shouwn.oj.model.entity.member.Member;
 import com.shouwn.oj.model.entity.member.Student;
-import com.shouwn.oj.model.entity.problem.Course;
-import com.shouwn.oj.model.entity.problem.Problem;
-import com.shouwn.oj.model.entity.problem.ProblemDetail;
-import com.shouwn.oj.model.entity.problem.Solution;
-import com.shouwn.oj.repository.member.AdminRepository;
-import com.shouwn.oj.repository.member.StudentRepository;
+import com.shouwn.oj.model.entity.problem.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static com.shouwn.oj.model.enums.ProblemType.HOMEWORK;
 
-@ExtendWith(SpringExtension.class)
 @Import(RepositoryTestConfig.class)
 @DataJpaTest
 public class SolutionRepositoryTest {
 
 	@Autowired
-	private AdminRepository adminRepository;
-
-	@Autowired
-	private StudentRepository studentRepository;
-
-	@Autowired
-	private CourseRepository courseRepository;
-
-	@Autowired
-	private ProblemRepository problemRepository;
-
-	@Autowired
-	private ProblemDetailRepository problemDetailRepository;
-
-	@Autowired
 	private SolutionRepository solutionRepository;
 
-	private Admin professor;
+	@Autowired
+	private EntityManager em;
 
-	private Student student;
+	private Solution sampleSolution;
 
-	private Course course;
-
-	private Problem problem;
-
-	private ProblemDetail problemDetail;
-
-	private Solution solution;
+	public SolutionRepositoryTest() {
+	}
 
 	@BeforeEach
 	void init() {
-		this.professor = Admin.builder()
+		Admin savedProfessor = Admin.builder()
+				.name("tester_professor")
 				.username("test_professor")
 				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
+				.email("test.admin@gmail.com")
 				.build();
 
-		this.professor = this.adminRepository.save(this.professor);
-
-		this.course = Course.builder()
+		Course savedCourse = Course.builder()
 				.name("junit_test")
 				.description("test")
-				.enabled(true)
-				.professor(this.professor)
+				.professor(savedProfessor)
 				.build();
 
-		this.course = this.courseRepository.save(this.course);
+		savedCourse.setEnabled(true);
+		savedProfessor.getCourses().add(savedCourse);
 
-		this.professor.getCourses().add(this.course);
+		Problem savedProblem = Problem.builder()
+				.type(HOMEWORK)
+				.title("junit_test_problem")
+				.course(savedCourse)
+				.build();
 
-		this.student = Student.builder()
+		savedCourse.getProblems().add(savedProblem);
+
+		Student savedStudent = Student.builder()
+				.name("tester_student")
 				.username("test_student")
 				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
+				.email("test.student@gmail.com")
 				.build();
 
-		this.student.getCourses().add(this.course);
-		this.student = this.studentRepository.save(this.student);
-
-		this.course.getStudents().add(this.student);
-
-		this.problem = Problem.builder()
-				.type(HOMEWORK)
-				.title("junit_test")
-				.course(this.course)
+		CourseRegister register = CourseRegister.builder()
+				.student(savedStudent)
+				.course(savedCourse)
 				.build();
 
-		this.problem = this.problemRepository.save(this.problem);
+		savedStudent.getRegisters().add(register);
+		savedCourse.getRegisters().add(register);
 
-		this.course.getProblems().add(this.problem);
-
-		this.problemDetail = ProblemDetail.builder()
-				.title("junit_test")
+		ProblemDetail savedProblemDetail = ProblemDetail.builder()
+				.title("junit_test_detail")
 				.content("junit-test")
 				.sequence(1)
-				.problem(this.problem)
+				.problem(savedProblem)
 				.build();
 
-		this.problemDetail = this.problemDetailRepository.save(this.problemDetail);
+		savedProblem.getProblemDetails().add(savedProblemDetail);
 
-		this.problem.getProblemDetails().add(this.problemDetail);
-
-		this.solution = Solution.builder()
-				.content("junit_test")
-				.score(2)
-				.member(this.student)
-				.problemDetail(this.problemDetail)
+		sampleSolution = Solution.builder()
+				.content("public static void main() { }")
+				.score(10)
+				.member(savedStudent)
+				.problemDetail(savedProblemDetail)
 				.build();
 
-		this.solution = this.solutionRepository.save(solution);
+		em.persist(savedProfessor);
+		em.persist(savedStudent);
+		em.persist(savedCourse);
+		em.persist(savedProblem);
+		em.persist(savedProblemDetail);
 
-		this.student.getSolutions().add(this.solution);
-		this.problemDetail.getSolutions().add(this.solution);
+		savedProblemDetail.getSolutions().add(sampleSolution);
+		savedStudent.getSolutions().add(sampleSolution);
+	}
+
+	private void assertEquals(Solution expected, Solution actual) {
+		Assertions.assertEquals(expected.getContent(), actual.getContent());
+		Assertions.assertEquals(expected.getScore(), actual.getScore());
+		Assertions.assertEquals(expected.getMember().getId(), actual.getMember().getId());
+		Assertions.assertEquals(expected.getProblemDetail().getId(), actual.getProblemDetail().getId());
 	}
 
 	@Test
-	public void findById() {
-		Solution findSolution = this.solutionRepository.findById(this.solution.getId())
+	public void saveAndFind() {
+		Solution savedSolution = solutionRepository.save(sampleSolution);
+
+		em.flush();
+		em.clear();
+
+		Solution findSolution = this.solutionRepository.findById(savedSolution.getId())
 				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
 
-		Assertions.assertEquals(this.solution.getContent(), findSolution.getContent());
-		Assertions.assertEquals(this.solution.getScore(), findSolution.getScore());
-		Assertions.assertEquals(this.solution.getMember(), findSolution.getMember());
-		Assertions.assertEquals(this.solution.getProblemDetail(), findSolution.getProblemDetail());
+		assertEquals(savedSolution, findSolution);
 	}
 
 	@Test
 	public void update() {
-		Long idBeforeUpdate = this.solution.getId();
-		int scoreBeforeUpdate = this.solution.getScore();
-
-		this.solution.setScore(4);
-
-		Solution s = this.solutionRepository.save(this.solution);
-
-		Assertions.assertEquals(idBeforeUpdate, s.getId());
-		Assertions.assertNotEquals(scoreBeforeUpdate, s.getScore());
+		// solution 은 수정되면 안 됨
 	}
 
 	@Test
 	public void delete() {
-		this.solutionRepository.delete(this.solution);
+		Solution savedSolution = solutionRepository.save(sampleSolution);
 
-		Assertions.assertFalse(this.solutionRepository.findById(this.solution.getId()).isPresent());
+		em.flush();
+
+		this.solutionRepository.delete(savedSolution);
+
+		em.flush();
+		em.clear();
+
+		Assertions.assertFalse(this.solutionRepository.findById(savedSolution.getId()).isPresent());
 	}
 
 	@Test
 	public void findSolutionsByProblemDetailAndMember() {
-		List<Solution> solutions = this.solutionRepository.findSolutionsByProblemDetailAndMember(this.problemDetail, this.student);
+		Member sampleMember = sampleSolution.getMember();
+		ProblemDetail sampleProblemDetail = sampleSolution.getProblemDetail();
 
-		Assertions.assertEquals(this.solution, solutions.get(0));
+		List<Solution> beforeSolutions = this.solutionRepository.findSolutionsByProblemDetailAndMember(sampleProblemDetail, sampleMember);
+
+		int beforeSaveCount = beforeSolutions.size();
+
+		Solution savedSolution = solutionRepository.save(sampleSolution);
+
+		Member savedMember = savedSolution.getMember();
+		ProblemDetail savedProblemDetail = savedSolution.getProblemDetail();
+
+		em.flush();
+		em.clear();
+
+		List<Solution> afterSolutions = this.solutionRepository.findSolutionsByProblemDetailAndMember(savedProblemDetail, savedMember);
+
+		Assertions.assertEquals(beforeSaveCount + 1, afterSolutions.size());
 	}
 }

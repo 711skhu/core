@@ -1,26 +1,25 @@
 package com.shouwn.oj.repository.problem;
 
+import javax.persistence.EntityManager;
+
 import com.shouwn.oj.config.repository.RepositoryTestConfig;
+import com.shouwn.oj.exception.IllegalStateException;
 import com.shouwn.oj.model.entity.member.Admin;
 import com.shouwn.oj.model.entity.member.Student;
 import com.shouwn.oj.model.entity.problem.Comment;
 import com.shouwn.oj.model.entity.problem.Course;
 import com.shouwn.oj.model.entity.problem.Problem;
 import com.shouwn.oj.model.entity.problem.ProblemDetail;
-import com.shouwn.oj.repository.member.AdminRepository;
-import com.shouwn.oj.repository.member.StudentRepository;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static com.shouwn.oj.model.enums.ProblemType.PRACTICE;
 
-@ExtendWith(SpringExtension.class)
 @Import(RepositoryTestConfig.class)
 @DataJpaTest
 public class CommentRepositoryTest {
@@ -29,241 +28,149 @@ public class CommentRepositoryTest {
 	private CommentRepository commentRepository;
 
 	@Autowired
-	private StudentRepository studentRepository;
+	private EntityManager em;
 
-	@Autowired
-	private AdminRepository adminRepository;
+	private Comment sampleProfessorComment;
 
-	@Autowired
-	private ProblemRepository problemRepository;
+	private Comment sampleStudentComment;
 
-	@Autowired
-	private ProblemDetailRepository problemDetailRepository;
-
-	@Autowired
-	private CourseRepository courseRepository;
-
-	@Test
-	public void saveAndFind() {
-		Student student = Student.builder()
+	@BeforeEach
+	public void init() {
+		Student savedStudent = Student.builder()
+				.name("tester_student")
 				.username("junit_tester_student")
 				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
+				.email("test.student@gmail.com")
 				.build();
 
-		studentRepository.save(student);
-
-		Admin professor = Admin.builder()
+		Admin savedProfessor = Admin.builder()
+				.name("tester_professor")
 				.username("junit_tester_admin")
 				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
+				.email("test.admin@gmail.com")
 				.build();
 
-		adminRepository.save(professor);
-
-		Course newCourse = Course.builder()
+		Course savedCourse = Course.builder()
 				.name("junit_test")
 				.description("test")
-				.enabled(false)
-				.professor(professor)
+				.professor(savedProfessor)
 				.build();
 
-		courseRepository.save(newCourse);
-
-		Problem problem = Problem.builder()
+		Problem savedProblem = Problem.builder()
 				.type(PRACTICE)
-				.title("junit_test")
-				.course(newCourse)
+				.title("junit_test_problem")
+				.course(savedCourse)
 				.build();
 
-		problemRepository.save(problem);
+		savedCourse.getProblems().add(savedProblem);
 
-		ProblemDetail problemDetail = ProblemDetail.builder()
+		ProblemDetail savedProblemDetail = ProblemDetail.builder()
 				.title("junit_test")
 				.content("test")
 				.sequence(1)
-				.problem(problem)
+				.problem(savedProblem)
 				.build();
 
-		problemDetailRepository.save(problemDetail);
+		savedProblem.getProblemDetails().add(savedProblemDetail);
 
-		Comment parentComment = Comment.builder()
-				.title("junit_test")
-				.member(professor)
-				.problemDetail(problemDetail)
-				.parent(null)
+		em.persist(savedStudent);
+		em.persist(savedProfessor);
+		em.persist(savedCourse);
+		em.persist(savedProblem);
+		em.persist(savedProblemDetail);
+
+		sampleStudentComment = Comment.builder()
+				.title("junit_test_student_comment")
+				.member(savedStudent)
+				.problemDetail(savedProblemDetail)
 				.build();
 
-		commentRepository.save(parentComment);
-
-		Comment comment = Comment.builder()
-				.title("junit_test")
-				.member(student)
-				.problemDetail(problemDetail)
-				.parent(parentComment)
+		sampleProfessorComment = Comment.builder()
+				.title("junit_test_professor_comment")
+				.member(savedProfessor)
+				.problemDetail(savedProblemDetail)
 				.build();
+	}
 
-		commentRepository.save(comment);
+	private void assertEquals(Comment expected, Comment actual) {
+		Assertions.assertEquals(expected.getTitle(), actual.getTitle());
+		Assertions.assertEquals(expected.getMember().getId(), actual.getMember().getId());
+		Assertions.assertEquals(expected.getProblemDetail().getId(), actual.getProblemDetail().getId());
 
-		Comment findComment = commentRepository.findById(comment.getId())
+		if (expected.getParent() != null) {
+			Assertions.assertNotNull(actual.getParent());
+			Assertions.assertEquals(expected.getParent().getId(), actual.getParent().getId());
+		} else {
+			Assertions.assertNull(actual.getParent());
+		}
+	}
+
+	@Test
+	public void saveAndFind() {
+		Comment savedStudentComment =  commentRepository.save(sampleStudentComment);
+		Comment savedProfessorComment = commentRepository.save(sampleProfessorComment);
+
+		savedProfessorComment.setParent(savedStudentComment);
+		savedStudentComment.getChildren().add(savedProfessorComment);
+
+		em.flush();
+		em.clear();
+
+		Comment findStudentComment = commentRepository.findById(savedStudentComment.getId())
 				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
 
-		Assertions.assertEquals(comment.getMember(), findComment.getMember());
-		Assertions.assertEquals(comment.getProblemDetail(), findComment.getProblemDetail());
-		Assertions.assertEquals(comment.getParent(), findComment.getParent());
-		Assertions.assertEquals(comment.getTitle(), findComment.getTitle());
+		Comment findProfessorComment = commentRepository.findById(savedProfessorComment.getId())
+				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
+
+		Assertions.assertNotNull(findProfessorComment.getParent());
+		Assertions.assertFalse(findStudentComment.getChildren().isEmpty());
+
+		assertEquals(savedStudentComment, findStudentComment);
+		assertEquals(savedProfessorComment, findProfessorComment);
 	}
 
 	@Test
 	public void update() {
-		Student student = Student.builder()
-				.username("junit_tester_student")
-				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
-				.build();
+		Comment savedComment = commentRepository.save(sampleStudentComment);
 
-		studentRepository.save(student);
+		em.flush();
 
-		Admin professor = Admin.builder()
-				.username("junit_tester_admin")
-				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
-				.build();
+		savedComment.setTitle("update_junit_test_comment");
 
-		adminRepository.save(professor);
+		em.flush();
+		em.clear();
 
-		Course newCourse = Course.builder()
-				.name("junit_test")
-				.description("test")
-				.enabled(false)
-				.professor(professor)
-				.build();
-
-		courseRepository.save(newCourse);
-
-		Problem problem = Problem.builder()
-				.type(PRACTICE)
-				.title("junit_test")
-				.course(newCourse)
-				.build();
-
-		problemRepository.save(problem);
-
-		ProblemDetail problemDetail = ProblemDetail.builder()
-				.title("junit_test")
-				.content("test")
-				.sequence(1)
-				.problem(problem)
-				.build();
-
-		problemDetailRepository.save(problemDetail);
-
-		Comment parentComment = Comment.builder()
-				.title("junit_test")
-				.member(professor)
-				.problemDetail(problemDetail)
-				.parent(null)
-				.build();
-
-		commentRepository.save(parentComment);
-
-		Comment comment = Comment.builder()
-				.title("junit_test")
-				.member(student)
-				.problemDetail(problemDetail)
-				.parent(parentComment)
-				.build();
-
-		commentRepository.save(comment);
-
-		comment.setTitle("update_junit_test");
-
-		Comment findComment = commentRepository.findById(comment.getId())
+		Comment findComment = commentRepository.findById(savedComment.getId())
 				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
 
-		Assertions.assertEquals(comment.getMember(), findComment.getMember());
-		Assertions.assertEquals(comment.getProblemDetail(), findComment.getProblemDetail());
-		Assertions.assertEquals(comment.getParent(), findComment.getParent());
-		Assertions.assertEquals(comment.getTitle(), findComment.getTitle());
+		assertEquals(savedComment, findComment);
 	}
 
 	@Test
 	public void delete() {
-		Student student = Student.builder()
-				.username("junit_tester_student")
-				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
-				.build();
+		Comment savedComment = commentRepository.save(sampleStudentComment);
 
-		studentRepository.save(student);
+		em.flush();
 
-		Admin professor = Admin.builder()
-				.username("junit_tester_admin")
-				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
-				.build();
+		commentRepository.delete(savedComment);
 
-		adminRepository.save(professor);
+		em.flush();
+		em.clear();
 
-		Course newCourse = Course.builder()
-				.name("junit_test")
-				.description("test")
-				.enabled(false)
-				.professor(professor)
-				.build();
+		Assertions.assertFalse(commentRepository.findById(savedComment.getId()).isPresent());
+	}
 
-		courseRepository.save(newCourse);
+	@Test
+	public void notPossibleDeleteIfHaveChildren() {
+		Comment savedStudentComment =  commentRepository.save(sampleStudentComment);
+		Comment savedProfessorComment = commentRepository.save(sampleProfessorComment);
 
-		Problem problem = Problem.builder()
-				.type(PRACTICE)
-				.title("junit_test")
-				.course(newCourse)
-				.build();
+		savedProfessorComment.setParent(savedStudentComment);
+		savedStudentComment.getChildren().add(savedProfessorComment);
 
-		problemRepository.save(problem);
+		em.flush();
 
-		ProblemDetail problemDetail = ProblemDetail.builder()
-				.title("junit_test")
-				.content("test")
-				.sequence(1)
-				.problem(problem)
-				.build();
-
-		problemDetailRepository.save(problemDetail);
-
-		Comment parentComment = Comment.builder()
-				.title("junit_test")
-				.member(professor)
-				.problemDetail(problemDetail)
-				.build();
-
-		commentRepository.save(parentComment);
-
-		Comment comment = Comment.builder()
-				.title("junit_test")
-				.member(student)
-				.problemDetail(problemDetail)
-				.parent(parentComment)
-				.build();
-
-		commentRepository.save(comment);
-
-		Comment findComment = commentRepository.findById(comment.getId())
-				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
-
-		Assertions.assertEquals(comment.getMember(), findComment.getMember());
-		Assertions.assertEquals(comment.getProblemDetail(), findComment.getProblemDetail());
-		Assertions.assertEquals(comment.getParent(), findComment.getParent());
-		Assertions.assertEquals(comment.getTitle(), findComment.getTitle());
-
-		commentRepository.delete(comment);
-
-		Assertions.assertFalse(commentRepository.findById(comment.getId()).isPresent());
+		Assertions.assertThrows(IllegalStateException.class, () ->
+				commentRepository.delete(savedStudentComment));
 	}
 }

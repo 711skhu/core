@@ -1,9 +1,12 @@
 package com.shouwn.oj.model.entity.problem;
 
+import java.util.Objects;
 import javax.persistence.*;
 
+import com.shouwn.oj.exception.InvalidParameterException;
 import com.shouwn.oj.model.entity.BaseEntity;
 import lombok.*;
+import org.apache.commons.lang3.StringUtils;
 
 @Getter
 @Setter
@@ -27,6 +30,14 @@ public class TestCase extends BaseEntity {
 
 	@Builder
 	public TestCase(String params, String result, ProblemDetail problemDetail) {
+		if (Objects.isNull(problemDetail)) {
+			throw new InvalidParameterException("대상이 되는 문제가 있어야 합니다.");
+		}
+
+		if (StringUtils.isBlank(params) || StringUtils.isBlank(result)) {
+			throw new InvalidParameterException("입력 혹은 출력 데이터가 없습니다.");
+		}
+
 		this.params = params;
 		this.result = result;
 		this.problemDetail = problemDetail;
