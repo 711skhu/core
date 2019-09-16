@@ -1,206 +1,129 @@
 package com.shouwn.oj.repository.problem;
 
+import javax.persistence.EntityManager;
+
 import com.shouwn.oj.config.repository.RepositoryTestConfig;
 import com.shouwn.oj.model.entity.member.Admin;
 import com.shouwn.oj.model.entity.problem.Course;
 import com.shouwn.oj.model.entity.problem.Problem;
 import com.shouwn.oj.model.entity.problem.ProblemDetail;
 import com.shouwn.oj.model.entity.problem.TestCase;
-import com.shouwn.oj.repository.member.AdminRepository;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static com.shouwn.oj.model.enums.ProblemType.HOMEWORK;
 
-@ExtendWith(SpringExtension.class)
 @Import(RepositoryTestConfig.class)
 @DataJpaTest
 public class TestCaseRepositoryTest {
 
 	@Autowired
-	private AdminRepository adminRepository;
-
-	@Autowired
-	private CourseRepository courseRepository;
-
-	@Autowired
-	private ProblemRepository problemRepository;
-
-	@Autowired
-	private ProblemDetailRepository problemDetailRepository;
-
-	@Autowired
 	private TestCaseRepository testCaseRepository;
+
+	@Autowired
+	private EntityManager em;
+
+	private TestCase sampleTestCase;
+
+	@BeforeEach
+	public void init() {
+		Admin savedProfessor = Admin.builder()
+				.name("tester_admin")
+				.username("junit_tester_admin")
+				.password("test123")
+				.email("test.admin@gmail.com")
+				.build();
+
+		Course savedCourse = Course.builder()
+				.name("junit_test")
+				.description("test")
+				.professor(savedProfessor)
+				.build();
+
+		savedCourse.setEnabled(true);
+		savedProfessor.getCourses().add(savedCourse);
+
+		Problem savedProblem = Problem.builder()
+				.type(HOMEWORK)
+				.title("junit_test_problem")
+				.course(savedCourse)
+				.build();
+
+		savedCourse.getProblems().add(savedProblem);
+
+		ProblemDetail savedProblemDetail = ProblemDetail.builder()
+				.title("junit_test_detail")
+				.content("junit-test_detail")
+				.sequence(1)
+				.problem(savedProblem)
+				.build();
+
+		savedProblem.getProblemDetails().add(savedProblemDetail);
+
+		em.persist(savedProfessor);
+		em.persist(savedCourse);
+		em.persist(savedProblem);
+		em.persist(savedProblemDetail);
+
+		sampleTestCase = TestCase.builder()
+				.params("1")
+				.result("100")
+				.problemDetail(savedProblemDetail)
+				.build();
+
+		savedProblemDetail.getTestCases().add(sampleTestCase);
+	}
+
+	private void assertEquals(TestCase expected, TestCase actual) {
+		Assertions.assertEquals(expected.getParams(), actual.getParams());
+		Assertions.assertEquals(expected.getResult(), actual.getResult());
+		Assertions.assertEquals(expected.getProblemDetail().getId(), actual.getProblemDetail().getId());
+	}
 
 	@Test
 	public void saveAndFind() {
-		Admin professor = Admin.builder()
-				.username("junit_tester")
-				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
-				.build();
+		TestCase savedTestCase = testCaseRepository.save(sampleTestCase);
 
-		adminRepository.save(professor);
+		em.flush();
+		em.clear();
 
-		Course newCourse = Course.builder()
-				.name("junit_test")
-				.description("test")
-				.enabled(true)
-				.professor(professor)
-				.build();
-
-		courseRepository.save(newCourse);
-
-		Problem problem = Problem.builder()
-				.type(HOMEWORK)
-				.title("junit_test")
-				.course(newCourse)
-				.build();
-
-		problemRepository.save(problem);
-
-		ProblemDetail problemDetail = ProblemDetail.builder()
-				.title("junit_test")
-				.content("junit-test")
-				.sequence(1)
-				.problem(problem)
-				.build();
-
-		problemDetailRepository.save(problemDetail);
-
-		TestCase testCase = TestCase.builder()
-				.params("1")
-				.result("100")
-				.problemDetail(problemDetail)
-				.build();
-
-		testCaseRepository.save(testCase);
-
-		TestCase findTestCase = testCaseRepository.findById(testCase.getId())
+		TestCase findTestCase = testCaseRepository.findById(savedTestCase.getId())
 				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
 
-		Assertions.assertEquals(testCase.getParams(), findTestCase.getParams());
-		Assertions.assertEquals(testCase.getResult(), findTestCase.getResult());
-		Assertions.assertEquals(testCase.getProblemDetail(), findTestCase.getProblemDetail());
+		assertEquals(savedTestCase, findTestCase);
 	}
 
 	@Test
 	public void update() {
-		Admin professor = Admin.builder()
-				.username("junit_tester")
-				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
-				.build();
+		TestCase savedTestCase = testCaseRepository.save(sampleTestCase);
 
-		adminRepository.save(professor);
+		em.flush();
 
-		Course newCourse = Course.builder()
-				.name("junit_test")
-				.description("test")
-				.enabled(true)
-				.professor(professor)
-				.build();
+		savedTestCase.setParams("2");
+		savedTestCase.setResult("150");
 
-		courseRepository.save(newCourse);
+		em.flush();
+		em.clear();
 
-		Problem problem = Problem.builder()
-				.type(HOMEWORK)
-				.title("junit_test")
-				.course(newCourse)
-				.build();
-
-		problemRepository.save(problem);
-
-		ProblemDetail problemDetail = ProblemDetail.builder()
-				.title("junit_test")
-				.content("junit-test")
-				.sequence(1)
-				.problem(problem)
-				.build();
-
-		problemDetailRepository.save(problemDetail);
-
-		TestCase testCase = TestCase.builder()
-				.params("1")
-				.result("100")
-				.problemDetail(problemDetail)
-				.build();
-
-		testCaseRepository.save(testCase);
-
-		testCase.setParams("2");
-		testCase.setResult("150");
-
-		TestCase findTestCase = testCaseRepository.findById(testCase.getId())
+		TestCase findTestCase = testCaseRepository.findById(savedTestCase.getId())
 				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
 
-		Assertions.assertEquals(testCase.getParams(), findTestCase.getParams());
-		Assertions.assertEquals(testCase.getResult(), findTestCase.getResult());
-		Assertions.assertEquals(testCase.getProblemDetail(), findTestCase.getProblemDetail());
+		assertEquals(savedTestCase, findTestCase);
 	}
 
 	@Test
 	public void delete() {
-		Admin professor = Admin.builder()
-				.username("junit_tester")
-				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
-				.build();
+		TestCase savedTestCase = testCaseRepository.save(sampleTestCase);
 
-		adminRepository.save(professor);
+		em.flush();
 
-		Course newCourse = Course.builder()
-				.name("junit_test")
-				.description("test")
-				.enabled(true)
-				.professor(professor)
-				.build();
+		testCaseRepository.delete(savedTestCase);
 
-		courseRepository.save(newCourse);
-
-		Problem problem = Problem.builder()
-				.type(HOMEWORK)
-				.title("junit_test")
-				.course(newCourse)
-				.build();
-
-		problemRepository.save(problem);
-
-		ProblemDetail problemDetail = ProblemDetail.builder()
-				.title("junit_test")
-				.content("junit-test")
-				.sequence(1)
-				.problem(problem)
-				.build();
-
-		problemDetailRepository.save(problemDetail);
-
-		TestCase testCase = TestCase.builder()
-				.params("1")
-				.result("100")
-				.problemDetail(problemDetail)
-				.build();
-
-		testCaseRepository.save(testCase);
-
-		TestCase findTestCase = testCaseRepository.findById(testCase.getId())
-				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
-
-		Assertions.assertEquals(testCase.getParams(), findTestCase.getParams());
-		Assertions.assertEquals(testCase.getResult(), findTestCase.getResult());
-		Assertions.assertEquals(testCase.getProblemDetail(), findTestCase.getProblemDetail());
-
-		testCaseRepository.delete(testCase);
-
-		Assertions.assertFalse(testCaseRepository.findById(testCase.getId()).isPresent());
+		Assertions.assertFalse(testCaseRepository.findById(savedTestCase.getId()).isPresent());
 	}
 }

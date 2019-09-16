@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class SolutionServiceTest {
+class SolutionServiceTest {
 
 	@Mock
 	private SolutionRepository solutionRepository;
@@ -26,15 +26,7 @@ public class SolutionServiceTest {
 
 	private Student student;
 
-	private Admin professor;
-
-	private Course course;
-
-	private Problem problem;
-
 	private ProblemDetail problemDetail;
-
-	private TestCase testCase;
 
 	private Solution solution;
 
@@ -42,21 +34,22 @@ public class SolutionServiceTest {
 	void init() {
 		this.solutionService = new SolutionService(this.solutionRepository);
 
-		this.professor = Admin.builder()
+		Admin professor = Admin.builder()
 				.name("test_professor")
 				.username("test_professor")
 				.password("test1234")
 				.email("test@skhu.ac.kr")
 				.build();
 
-		this.course = Course.builder()
+		Course course = Course.builder()
 				.name("test")
 				.description("test")
-				.enabled(true)
-				.professor(this.professor)
+				.professor(professor)
 				.build();
 
-		this.professor.getCourses().add(this.course);
+		course.setEnabled(true);
+
+		professor.getCourses().add(course);
 
 		this.student = Student.builder()
 				.name("test_student")
@@ -65,33 +58,38 @@ public class SolutionServiceTest {
 				.email("tst@skhu.ac.kr")
 				.build();
 
-		this.student.getCourses().add(this.course);
-		this.course.getStudents().add(this.student);
-
-		this.problem = Problem.builder()
-				.title("test")
-				.type(ProblemType.PRACTICE)
-				.course(this.course)
+		CourseRegister register = CourseRegister.builder()
+				.course(course)
+				.student(student)
 				.build();
 
-		this.course.getProblems().add(this.problem);
+		this.student.getRegisters().add(register);
+		course.getRegisters().add(register);
+
+		Problem problem = Problem.builder()
+				.title("test")
+				.type(ProblemType.PRACTICE)
+				.course(course)
+				.build();
+
+		course.getProblems().add(problem);
 
 		this.problemDetail = ProblemDetail.builder()
 				.title("test1")
 				.sequence(1)
 				.content("test")
-				.problem(this.problem)
+				.problem(problem)
 				.build();
 
-		this.problem.getProblemDetails().add(this.problemDetail);
+		problem.getProblemDetails().add(this.problemDetail);
 
-		this.testCase = TestCase.builder()
+		TestCase testCase = TestCase.builder()
 				.params("1")
 				.result("1")
 				.problemDetail(this.problemDetail)
 				.build();
 
-		this.problemDetail.getTestCases().add(this.testCase);
+		this.problemDetail.getTestCases().add(testCase);
 
 		this.solution = Solution.builder()
 				.content("test")

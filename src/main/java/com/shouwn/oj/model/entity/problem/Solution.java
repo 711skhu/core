@@ -2,6 +2,7 @@ package com.shouwn.oj.model.entity.problem;
 
 import javax.persistence.*;
 
+import com.querydsl.core.annotations.QueryInit;
 import com.shouwn.oj.model.entity.BaseEntity;
 import com.shouwn.oj.model.entity.member.Member;
 import lombok.*;
@@ -29,6 +30,7 @@ public class Solution extends BaseEntity {
 	@JoinColumn(name = "member_id")
 	private Member member;
 
+	@QueryInit("problem.*")
 	@ManyToOne
 	@JoinColumn(name = "problem_detail_id")
 	private ProblemDetail problemDetail;

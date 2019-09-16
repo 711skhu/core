@@ -3,12 +3,15 @@ package com.shouwn.oj.model.entity.problem;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import javax.persistence.*;
 
+import com.shouwn.oj.exception.InvalidParameterException;
 import com.shouwn.oj.model.entity.BaseEntity;
 import com.shouwn.oj.model.entity.member.Admin;
-import com.shouwn.oj.model.entity.member.Student;
 import lombok.*;
+import org.apache.commons.lang3.StringUtils;
 
 @Getter
 @Setter
@@ -20,7 +23,7 @@ public class Course extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long id = 0L;
 
 	@Column(nullable = false)
 	private String name;
@@ -38,27 +41,26 @@ public class Course extends BaseEntity {
 	@JoinColumn(name = "professor_id")
 	private Admin professor;
 
-	@ManyToMany(mappedBy = "courses")
-	private List<Student> students = new ArrayList<>();
+	@OneToMany(mappedBy = "course")
+	private List<CourseRegister> registers = new ArrayList<>();
 
 	@OneToMany(mappedBy = "course")
 	private List<Problem> problems = new ArrayList<>();
 
 	@Builder
-	public Course(String name, String description, Boolean enabled, Admin professor) {
-		this.name = name;
-		this.description = description;
-		this.enabled = enabled;
-		this.professor = professor;
-	}
-
-	public void activeCourse(Boolean enabled) {
-		this.enabled = enabled;
-
-		if (enabled == true) {
-			this.activeDate = LocalDateTime.now();
-		} else if (enabled == false) {
-			this.getStudents().clear();
+	public Course(String name, String description, Admin professor) {
+		if (StringUtils.isBlank(name)) {
+			throw new InvalidParameterException("강좌 이름이 없습니다.");
 		}
+
+		if (Objects.isNull(professor)) {
+			throw new InvalidParameterException("강좌 생성자가 없습니다.");
+		}
+
+		this.name = name;
+		this.description = Optional.ofNullable(description).orElse("");
+		this.professor = professor;
+		this.enabled = false;
+		this.activeDate = LocalDateTime.MIN;
 	}
 }

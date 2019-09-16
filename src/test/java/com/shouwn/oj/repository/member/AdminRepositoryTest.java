@@ -1,17 +1,17 @@
 package com.shouwn.oj.repository.member;
 
+import javax.persistence.EntityManager;
+
 import com.shouwn.oj.config.repository.RepositoryTestConfig;
 import com.shouwn.oj.model.entity.member.Admin;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(SpringExtension.class)
 @Import(RepositoryTestConfig.class)
 @DataJpaTest
 public class AdminRepositoryTest {
@@ -19,72 +19,68 @@ public class AdminRepositoryTest {
 	@Autowired
 	private AdminRepository adminRepository;
 
-	@Test
-	public void saveAndFind() {
-		Admin admin = Admin.builder()
-				.username("junit_tester_1")
+	@Autowired
+	private EntityManager em;
+
+	private Admin sampleAdmin;
+
+	@BeforeEach
+	public void init() {
+		sampleAdmin = Admin.builder()
+				.name("tester_admin")
+				.username("junit_tester_admin")
 				.password("test123")
-				.name("tester")
 				.email("test@gmail.com")
 				.build();
+	}
 
-		adminRepository.save(admin);
+	private void assertEquals(Admin expected, Admin actual) {
+		Assertions.assertEquals(expected.getUsername(), actual.getUsername());
+		Assertions.assertEquals(expected.getPassword(), actual.getPassword());
+		Assertions.assertEquals(expected.getName(), actual.getName());
+		Assertions.assertEquals(expected.getEmail(), actual.getEmail());
+	}
 
-		Admin findAdmin = adminRepository.findById(admin.getId())
+	@Test
+	public void saveAndFind() {
+		Admin savedAdmin = adminRepository.save(sampleAdmin);
+
+		em.flush();
+		em.clear();
+
+		Admin findAdmin = adminRepository.findById(savedAdmin.getId())
 				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
 
-		Assertions.assertEquals(admin.getUsername(), findAdmin.getUsername());
-		Assertions.assertEquals(admin.getPassword(), findAdmin.getPassword());
-		Assertions.assertEquals(admin.getName(), findAdmin.getName());
-		Assertions.assertEquals(admin.getEmail(), findAdmin.getEmail());
+		assertEquals(sampleAdmin, findAdmin);
 	}
 
 	@Test
 	public void update() {
-		Admin admin = Admin.builder()
-				.username("junit_tester_1")
-				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
-				.build();
+		Admin savedAdmin = adminRepository.save(sampleAdmin);
 
-		adminRepository.save(admin);
+		em.flush();
 
-		admin.setName("update_junit_tester_1");
-		admin.setPassword("udpate_test123");
-		admin.setName("update_tester");
-		admin.setEmail("udpate@gamil.com");
+		savedAdmin.setPassword("udpate_test123");
+		savedAdmin.setName("update_tester");
+		savedAdmin.setEmail("udpate@gamil.com");
 
-		Admin findAdmin = adminRepository.findById(admin.getId())
+		em.flush();
+		em.clear();
+
+		Admin findAdmin = adminRepository.findById(savedAdmin.getId())
 				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
 
-		Assertions.assertEquals(admin.getUsername(), findAdmin.getUsername());
-		Assertions.assertEquals(admin.getPassword(), findAdmin.getPassword());
-		Assertions.assertEquals(admin.getName(), findAdmin.getName());
-		Assertions.assertEquals(admin.getEmail(), findAdmin.getEmail());
+		assertEquals(sampleAdmin, findAdmin);
 	}
 
 	@Test
 	public void delete() {
-		Admin admin = Admin.builder()
-				.username("junit_tester_1")
-				.password("test123")
-				.name("tester")
-				.email("test@gmail.com")
-				.build();
+		Admin savedAdmin = adminRepository.save(sampleAdmin);
 
-		adminRepository.save(admin);
+		em.flush();
 
-		Admin findAdmin = adminRepository.findById(admin.getId())
-				.orElseThrow(() -> new RuntimeException("찾을 수 없습니다."));
+		adminRepository.delete(savedAdmin);
 
-		Assertions.assertEquals(admin.getUsername(), findAdmin.getUsername());
-		Assertions.assertEquals(admin.getPassword(), findAdmin.getPassword());
-		Assertions.assertEquals(admin.getName(), findAdmin.getName());
-		Assertions.assertEquals(admin.getEmail(), findAdmin.getEmail());
-
-		adminRepository.delete(admin);
-
-		Assertions.assertFalse(adminRepository.findById(admin.getId()).isPresent());
+		Assertions.assertFalse(adminRepository.findById(savedAdmin.getId()).isPresent());
 	}
 }
